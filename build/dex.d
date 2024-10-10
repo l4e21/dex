@@ -1,4 +1,5 @@
-dex.o: /home/jam/c/dex/source/dex.c /opt/devkitpro/libtonc/include/tonc.h \
+dex.o: /home/jam/c/dex/source/dex.c /home/jam/c/dex/include/dex.h \
+ /opt/devkitpro/libtonc/include/tonc.h \
  /opt/devkitpro/libtonc/include/tonc_types.h \
  /opt/devkitpro/libtonc/include/tonc_memmap.h \
  /opt/devkitpro/libtonc/include/tonc_memdef.h \
@@ -14,6 +15,7 @@ dex.o: /home/jam/c/dex/source/dex.c /opt/devkitpro/libtonc/include/tonc.h \
  /opt/devkitpro/libtonc/include/tonc_nocash.h \
  /opt/devkitpro/libtonc/include/tonc_text.h /home/jam/c/dex/build/mado.h \
  /home/jam/c/dex/build/room.h
+/home/jam/c/dex/include/dex.h:
 /opt/devkitpro/libtonc/include/tonc.h:
 /opt/devkitpro/libtonc/include/tonc_types.h:
 /opt/devkitpro/libtonc/include/tonc_memmap.h:
