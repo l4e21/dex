@@ -1,0 +1,1 @@
+room.o: room.s

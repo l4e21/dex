@@ -1,0 +1,1 @@
+mado.o: mado.s
