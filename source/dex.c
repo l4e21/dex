@@ -1,6 +1,8 @@
 #include "dex.h"
 
 int time = 1;
+int room = 0; // Bedroom
+int a_held = 0; // Bedroom
 
 int extract_tile_idx(SCR_ENTRY tile) {
   return tile & SE_ID_MASK;
@@ -25,6 +27,7 @@ int tile_is_solid(int tile_idx) {
 
 int init_mado(Mado* mado, int x, int y) {
   OBJ_ATTR *sprite = &obj_buffer[0];
+  OBJ_ATTR *emote = &obj_buffer[1];
   obj_set_attr(sprite,
 	       ATTR0_SQUARE,				// Square, regular sprite
 	       ATTR1_SIZE_16, 				// 64x64p,
@@ -32,11 +35,19 @@ int init_mado(Mado* mado, int x, int y) {
   
   obj_set_pos(sprite, x, y);
 
+  obj_set_attr(emote,
+	       ATTR0_SQUARE,				// Square, regular sprite
+	       ATTR1_SIZE_16, 				// 64x64p,
+	       ATTR2_PALBANK(1) | ATTR2_PRIO(1) | 40);		// palbank 0, tile 0
+  
+  obj_set_pos(emote, x, y-64);
+  
   mado->facing = None;
   mado->movement = 0;
   mado->posX = x;
   mado->posY = y;
   mado->sprite = sprite;
+  mado->emote = emote;
 
   return 0;
 };
@@ -140,7 +151,7 @@ int mado_try_move(Mado* mado) {
 
 int move_mado(Mado* mado) {
   // Check if mado can move, if so set movement
-  if (!mado->movement) {
+  if (!mado->movement && !mado->interacting) {
     if (key_is_down(KEY_UP)) {
       mado->facing = Up;
       mado_try_move(mado);
@@ -158,6 +169,11 @@ int move_mado(Mado* mado) {
       mado_try_move(mado);
     }
     
+  }
+
+  else if (mado->interacting) {
+    // Can't move during an interaction
+    return 0;
   }
 
   // If there is movement left, then move
@@ -194,8 +210,53 @@ int move_mado(Mado* mado) {
     turn_moving_mado(mado);
   };
     
-  
+		  
   obj_set_pos(mado->sprite, mado->posX, mado->posY);
+  obj_set_pos(mado->emote, mado->posX, mado->posY-16);
+  
+  return 0;
+};
+
+
+
+int interact(Mado* mado) {
+  // Check if mado can interact, if so interact
+  if (!mado->interacting && !mado->movement) {
+    if (key_is_down(KEY_A)) {
+      mado->interactionType = Heart;
+      mado->interacting = 24;
+      obj_unhide(mado->emote, 0);
+    }        
+  }
+
+  else if (mado->movement) {
+    // Can't interact during moving
+    return 0;
+  }
+
+  else {
+    // Interaction is occurring
+    switch (mado->interactionType) {
+    case Heart:
+      if (mado->interacting == 1) {
+	obj_set_attr(mado->emote,
+		     ATTR0_SQUARE,				// Square, regular sprite
+		     ATTR1_SIZE_16, 				// 64x64p,
+		     ATTR2_PALBANK(1) | ATTR2_PRIO(1) | 40);		// palbank 0, tile 0
+	obj_set_pos(mado->emote, mado->posX, mado->posY-16);
+	obj_hide(mado->emote);
+      }
+      else {
+	obj_set_attr(mado->emote,
+		     ATTR0_SQUARE,				// Square, regular sprite
+		     ATTR1_SIZE_16, 				// 64x64p,
+		     ATTR2_PALBANK(1) | ATTR2_PRIO(1) | (40 + (mado->interacting > 16 ? 0 : (mado->interacting > 8 ? 4 : 8))));		// palbank 0, tile 0
+	obj_set_pos(mado->emote, mado->posX, mado->posY-16);
+      };
+      break;
+    }
+    mado->interacting -=1;
+  };
   
   return 0;
 };
@@ -306,14 +367,14 @@ int draw_room() {
 
 int game_loop(Mado* mado) {
   int rain_offset = 69;
-  int room = 0; // 0 = Bedroom
   
   while(1) {
     vid_vsync();
     key_poll();
     move_mado(mado);
+    interact(mado);
     
-    oam_copy(oam_mem, obj_buffer, 1);	// only need to update one
+    oam_copy(oam_mem, obj_buffer, 16);	// only need to update one
 
     if (time % 2 == 0) {
       rain_offset -= 4;
@@ -347,20 +408,25 @@ int main() {
   REG_BG1VOFS= 0;
 
   // Room Tiles
-  memcpy16(&pal_bg_mem[0], roomPal, roomPalLen / sizeof(u16));
+  dma3_cpy(&pal_bg_mem[0], roomPal, roomPalLen / sizeof(u16));
   memcpy32(&tile_mem[CBB_0][1], roomTiles, roomTilesLen / sizeof(u32));
 
   /* // Bed Tiles */
-  memcpy16(&pal_bg_mem[16], bedPal, bedPalLen / sizeof(u16));
+  dma3_cpy(&pal_bg_mem[16], bedPal, bedPalLen / sizeof(u16));
   memcpy32(&tile_mem[CBB_0][61], bedTiles, bedTilesLen / sizeof(u32));
 
   /* // rain Tiles */
-  memcpy16(&pal_bg_mem[32], rainPal, rainPalLen / sizeof(u16));
+  dma3_cpy(&pal_bg_mem[32], rainPal, rainPalLen / sizeof(u16));
   memcpy32(&tile_mem[CBB_1][1], rainTiles, rainTilesLen / sizeof(u32));
   
   // Mado Sprite
   memcpy32(&tile_mem[4][0], madoTiles, madoTilesLen / sizeof(u32));
-  memcpy16(pal_obj_mem, madoPal, madoPalLen / sizeof(u16));
+  dma3_cpy(pal_obj_mem, madoPal, madoPalLen / sizeof(u16));
+
+  // Emotes Sprite
+  memcpy32(&tile_mem[4][40], emotesTiles, emotesTilesLen / sizeof(u32));
+  dma3_cpy(&pal_obj_mem[16], emotesPal, emotesPalLen/ sizeof(u16));
+
   oam_init(obj_buffer, 128);
 
   Mado mado = {0};

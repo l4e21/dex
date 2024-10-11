@@ -5,6 +5,7 @@
 #include "room.h"
 #include "bed.h"
 #include "rain.h"
+#include "emotes.h"
 
 #define CBB_0  0
 #define SBB_0 28
@@ -21,12 +22,18 @@ SCR_ENTRY *bg1_map= se_mem[SBB_1];
 enum __DIRECTION {Left, Down, Up, Right, None};
 typedef enum __DIRECTION Direction;
 
+enum __INTERACTION {Heart};
+typedef enum __INTERACTION Interaction;
+
 struct __MADO {
   int posX;
   int posY;
   Direction facing;
+  Interaction interactionType;
   int movement;
+  int interacting;
   OBJ_ATTR *sprite;
+  OBJ_ATTR *emote;
 };
 
 typedef struct __MADO Mado;
