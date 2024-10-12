@@ -1,6 +1,11 @@
+#ifndef DEX_H
+#define DEX_H
+
 #include <tonc.h>
 #include <stdlib.h>
 #include <string.h>
+
+#include "game_map.h"
 #include "mado.h"
 #include "room.h"
 #include "bed.h"
@@ -19,7 +24,7 @@ OBJ_AFFINE *obj_aff_buffer= (OBJ_AFFINE*)obj_buffer;
 SCR_ENTRY *bg0_map= se_mem[SBB_0];
 SCR_ENTRY *bg1_map= se_mem[SBB_1];
 
-enum __DIRECTION {Left, Down, Up, Right, None};
+enum __DIRECTION {Left, Down, Up, Right, InvalidDirection};
 typedef enum __DIRECTION Direction;
 
 enum __INTERACTION {Heart};
@@ -37,3 +42,5 @@ struct __MADO {
 };
 
 typedef struct __MADO Mado;
+
+#endif

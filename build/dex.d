@@ -13,7 +13,8 @@ dex.o: /home/jam/c/dex/source/dex.c /home/jam/c/dex/include/dex.h \
  /opt/devkitpro/libtonc/include/tonc_surface.h \
  /opt/devkitpro/libtonc/include/tonc_video.h \
  /opt/devkitpro/libtonc/include/tonc_nocash.h \
- /opt/devkitpro/libtonc/include/tonc_text.h /home/jam/c/dex/build/mado.h \
+ /opt/devkitpro/libtonc/include/tonc_text.h \
+ /home/jam/c/dex/include/game_map.h /home/jam/c/dex/build/mado.h \
  /home/jam/c/dex/build/room.h /home/jam/c/dex/build/bed.h \
  /home/jam/c/dex/build/rain.h /home/jam/c/dex/build/emotes.h
 /home/jam/c/dex/include/dex.h:
@@ -32,6 +33,7 @@ dex.o: /home/jam/c/dex/source/dex.c /home/jam/c/dex/include/dex.h \
 /opt/devkitpro/libtonc/include/tonc_video.h:
 /opt/devkitpro/libtonc/include/tonc_nocash.h:
 /opt/devkitpro/libtonc/include/tonc_text.h:
+/home/jam/c/dex/include/game_map.h:
 /home/jam/c/dex/build/mado.h:
 /home/jam/c/dex/build/room.h:
 /home/jam/c/dex/build/bed.h:

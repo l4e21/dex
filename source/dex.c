@@ -1,31 +1,19 @@
 #include "dex.h"
 
 int time = 1;
-int room = 0; // Bedroom
-int a_held = 0; // Bedroom
-
-int extract_tile_idx(SCR_ENTRY tile) {
-  return tile & SE_ID_MASK;
-}
-
-
-int tile_is_solid(int tile_idx) {
-  return (// Walls
-	  tile_idx == 9 || tile_idx == 10 || tile_idx == 11 || tile_idx == 12
-	  || tile_idx == 13 || tile_idx == 14|| tile_idx == 15 || tile_idx == 16
-	  // Blackspace
-	  || tile_idx == 0 || tile_idx == 1 || tile_idx == 2 || tile_idx == 3
-	  // Beds
-	  || tile_idx == 69 || tile_idx == 70 || tile_idx == 71 || tile_idx == 72
-	  || tile_idx == 81 || tile_idx == 82 || tile_idx == 83 || tile_idx == 84
-	  || tile_idx == 93 || tile_idx == 94 || tile_idx == 95 || tile_idx == 96
-	  || tile_idx == 109 || tile_idx == 110 || tile_idx == 111 || tile_idx == 112
-
-	  );
-}
-
+GameMap game_map = MadoBedroom;
+int a_held = 0; 
+int rain_offset = 69;
 
 int init_mado(Mado* mado, int x, int y) {
+    // Mado Sprite
+  memcpy32(&tile_mem[4][0], madoTiles, madoTilesLen / sizeof(u32));
+  dma3_cpy(pal_obj_mem, madoPal, madoPalLen / sizeof(u16));
+
+  // Emotes Sprite
+  memcpy32(&tile_mem[4][40], emotesTiles, emotesTilesLen / sizeof(u32));
+  dma3_cpy(&pal_obj_mem[16], emotesPal, emotesPalLen/ sizeof(u16));
+
   OBJ_ATTR *sprite = &obj_buffer[0];
   OBJ_ATTR *emote = &obj_buffer[1];
   obj_set_attr(sprite,
@@ -42,7 +30,7 @@ int init_mado(Mado* mado, int x, int y) {
   
   obj_set_pos(emote, x, y-64);
   
-  mado->facing = None;
+  mado->facing = InvalidMap;
   mado->movement = 0;
   mado->posX = x;
   mado->posY = y;
@@ -142,7 +130,7 @@ int mado_try_move(Mado* mado) {
       mado->movement = 8;
     }
     break;
-  case None:
+  case InvalidDirection:
     break;
   };
   return 0;
@@ -152,7 +140,16 @@ int mado_try_move(Mado* mado) {
 int move_mado(Mado* mado) {
   // Check if mado can move, if so set movement
   if (!mado->movement && !mado->interacting) {
-    if (key_is_down(KEY_UP)) {
+    // Check if on teleport tile first
+    GameMap teleportToMap = tile_is_teleport(extract_tile_idx(bg0_map[(mado->posX/8) + 32*((mado->posY/8) + 2)]));
+
+    if (teleportToMap != InvalidMap) {
+      // Initialise map change
+      /* game_map = teleportToMap; */
+    }
+    
+    // Try moving, face the direction anyway
+    else if (key_is_down(KEY_UP)) {
       mado->facing = Up;
       mado_try_move(mado);
     }    
@@ -196,7 +193,7 @@ int move_mado(Mado* mado) {
       mado->movement -= 1;
       break;
 
-    case None:
+    case InvalidDirection:
       // This is an error situation so don't move?
       break;
 
@@ -269,7 +266,7 @@ int draw_16_by_16(int idx, int pal, int tile_idx) {
   return 0;
 };
 
-int draw_room() {
+int draw_mado_bedroom() {
   int row = 1;
   int col = 1;
   int tile_idx = 0;
@@ -364,9 +361,68 @@ int draw_room() {
   return 0;
 };
 
+int init_mado_bedroom() {
+
+  // Room Tiles
+  dma3_cpy(&pal_bg_mem[0], roomPal, roomPalLen / sizeof(u16));
+  memcpy32(&tile_mem[CBB_0][1], roomTiles, roomTilesLen / sizeof(u32));
+
+  // Bed Tiles
+  dma3_cpy(&pal_bg_mem[16], bedPal, bedPalLen / sizeof(u16));
+  memcpy32(&tile_mem[CBB_0][61], bedTiles, bedTilesLen / sizeof(u32));
+
+  // Rain Tiles
+  dma3_cpy(&pal_bg_mem[32], rainPal, rainPalLen / sizeof(u16));
+  memcpy32(&tile_mem[CBB_1][1], rainTiles, rainTilesLen / sizeof(u32));
+  
+  draw_mado_bedroom();
+
+  return 0;
+};
+
+int init_game_map() {
+  switch (game_map) {
+  case MadoBedroom:
+    init_mado_bedroom();
+    break;
+  case MadoAttic:
+    break;
+  case InvalidMap:
+    break;
+  };
+  
+  return 0;
+};
+
+int update_mado_bedroom() {
+  if (time % 2 == 0) {
+    rain_offset -= 4;
+    if (rain_offset < 0) {
+      rain_offset = 69;
+    };
+    // Less memory efficient, less granular, more VRAM bandwidth, less cpu usage, less complexity
+    // For other foregrounds, it might be better to go by index-based tile swapping
+    memcpy32(&tile_mem[CBB_1][rain_offset], rainTiles, rainTilesLen / sizeof(u32));
+  };
+
+  return 0;
+};
+
+int update_game_map() {
+  switch (game_map) {
+  case MadoBedroom:
+    update_mado_bedroom();
+    break;
+  case MadoAttic:
+    break;
+  case InvalidMap:
+    break;
+  };
+  
+  return 0;
+};
 
 int game_loop(Mado* mado) {
-  int rain_offset = 69;
   
   while(1) {
     vid_vsync();
@@ -376,23 +432,18 @@ int game_loop(Mado* mado) {
     
     oam_copy(oam_mem, obj_buffer, 16);	// only need to update one
 
-    if (time % 2 == 0) {
-      rain_offset -= 4;
-      if (rain_offset < 0) {
-	rain_offset = 69;
-      };
-      
-      memcpy32(&tile_mem[CBB_1][rain_offset], rainTiles, rainTilesLen / sizeof(u32));
-    }; 
-
+    update_game_map();
+    
     time++;
     
   }
+  return 0;
 };
 
 int main() {
 
-  // Tile mode, bgs 0, 1
+  // Tile mode, bgs 0 (tiles), 1 (Foregrounds), later 2 (backgrounds)
+  // For sprites, 
   REG_DISPCNT= DCNT_MODE0 | DCNT_BG0 | DCNT_BG1 | DCNT_OBJ | DCNT_OBJ_1D;
   
   REG_BG0CNT= BG_CBB(CBB_0) | BG_SBB(SBB_0) | BG_REG_64x64 | BG_PRIO(1);
@@ -407,32 +458,12 @@ int main() {
   REG_BG1HOFS= 0;
   REG_BG1VOFS= 0;
 
-  // Room Tiles
-  dma3_cpy(&pal_bg_mem[0], roomPal, roomPalLen / sizeof(u16));
-  memcpy32(&tile_mem[CBB_0][1], roomTiles, roomTilesLen / sizeof(u32));
-
-  /* // Bed Tiles */
-  dma3_cpy(&pal_bg_mem[16], bedPal, bedPalLen / sizeof(u16));
-  memcpy32(&tile_mem[CBB_0][61], bedTiles, bedTilesLen / sizeof(u32));
-
-  /* // rain Tiles */
-  dma3_cpy(&pal_bg_mem[32], rainPal, rainPalLen / sizeof(u16));
-  memcpy32(&tile_mem[CBB_1][1], rainTiles, rainTilesLen / sizeof(u32));
-  
-  // Mado Sprite
-  memcpy32(&tile_mem[4][0], madoTiles, madoTilesLen / sizeof(u32));
-  dma3_cpy(pal_obj_mem, madoPal, madoPalLen / sizeof(u16));
-
-  // Emotes Sprite
-  memcpy32(&tile_mem[4][40], emotesTiles, emotesTilesLen / sizeof(u32));
-  dma3_cpy(&pal_obj_mem[16], emotesPal, emotesPalLen/ sizeof(u16));
-
   oam_init(obj_buffer, 128);
 
   Mado mado = {0};
-  init_mado(&mado, 96, 100);
   
-  draw_room();
+  init_mado(&mado, 96, 100);
+  init_game_map();
   game_loop(&mado);
   
 };
