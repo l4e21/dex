@@ -2,6 +2,7 @@
 
 int time = 1;
 GameMap game_map = MadoBedroom;
+GameMap teleport_to_map = InvalidMap;
 int a_held = 0; 
 int rain_offset = 69;
 
@@ -30,7 +31,7 @@ int init_mado(Mado* mado, int x, int y) {
   
   obj_set_pos(emote, x, y-64);
   
-  mado->facing = InvalidMap;
+  mado->facing = Down;
   mado->movement = 0;
   mado->posX = x;
   mado->posY = y;
@@ -136,20 +137,8 @@ int mado_try_move(Mado* mado) {
   return 0;
 };
 
-
-int move_mado(Mado* mado) {
-  // Check if mado can move, if so set movement
-  if (!mado->movement && !mado->interacting) {
-    // Check if on teleport tile first
-    GameMap teleportToMap = tile_is_teleport(extract_tile_idx(bg0_map[(mado->posX/8) + 32*((mado->posY/8) + 2)]));
-
-    if (teleportToMap != InvalidMap) {
-      // Initialise map change
-      /* game_map = teleportToMap; */
-    }
-    
-    // Try moving, face the direction anyway
-    else if (key_is_down(KEY_UP)) {
+int init_move_mado(Mado* mado) {
+    if (key_is_down(KEY_UP)) {
       mado->facing = Up;
       mado_try_move(mado);
     }    
@@ -165,108 +154,117 @@ int move_mado(Mado* mado) {
       mado->facing = Left;
       mado_try_move(mado);
     }
-    
-  }
 
-  else if (mado->interacting) {
-    // Can't move during an interaction
-    return 0;
-  }
-
-  // If there is movement left, then move
-  else {
-    switch (mado->facing) {
-    case Up:
-      mado->posY -= 1;
-      mado->movement -= 1;
-      break;
-    case Down:
-      mado->posY += 1;
-      mado->movement -= 1;
-      break;
-    case Left:
-      mado->posX -= 1;
-      mado->movement -= 1;
-      break;
-    case Right:
-      mado->posX += 1;
-      mado->movement -= 1;
-      break;
-
-    case InvalidDirection:
-      // This is an error situation so don't move?
-      break;
-
-    };
-  };
-
-  if (!mado->movement) {
     turn_mado(mado);
-  }
-  else {
-    turn_moving_mado(mado);
-  };
-    
-		  
-  obj_set_pos(mado->sprite, mado->posX, mado->posY);
-  obj_set_pos(mado->emote, mado->posX, mado->posY-16);
-  
-  return 0;
+
+    return 0;
 };
 
 
+int move_mado(Mado* mado) {
+  switch (mado->facing) {
+  case Up:
+    mado->posY -= 1;
+    mado->movement -= 1;
+    break;
+  case Down:
+    mado->posY += 1;
+    mado->movement -= 1;
+    break;
+  case Left:
+    mado->posX -= 1;
+    mado->movement -= 1;
+    break;
+  case Right:
+    mado->posX += 1;
+    mado->movement -= 1;
+    break;
+
+  case InvalidDirection:
+    // This is an error situation so don't move?
+    break;
+
+  };
+		  
+  return 0;
+};
+
+int init_interact(Mado* mado) {
+  if (key_is_down(KEY_A)) {
+    mado->interactionType = Heart;
+    mado->interacting = 24;
+    obj_unhide(mado->emote, 0);
+  };
+  
+  return 0;
+};
 
 int interact(Mado* mado) {
-  // Check if mado can interact, if so interact
-  if (!mado->interacting && !mado->movement) {
-    if (key_is_down(KEY_A)) {
-      mado->interactionType = Heart;
-      mado->interacting = 24;
-      obj_unhide(mado->emote, 0);
-    }        
-  }
-
-  else if (mado->movement) {
-    // Can't interact during moving
-    return 0;
-  }
-
-  else {
-    // Interaction is occurring
-    switch (mado->interactionType) {
-    case Heart:
-      if (mado->interacting == 1) {
-	obj_set_attr(mado->emote,
-		     ATTR0_SQUARE,				// Square, regular sprite
-		     ATTR1_SIZE_16, 				// 64x64p,
-		     ATTR2_PALBANK(1) | ATTR2_PRIO(1) | 40);		// palbank 0, tile 0
-	obj_set_pos(mado->emote, mado->posX, mado->posY-16);
-	obj_hide(mado->emote);
-      }
-      else {
-	obj_set_attr(mado->emote,
-		     ATTR0_SQUARE,				// Square, regular sprite
-		     ATTR1_SIZE_16, 				// 64x64p,
-		     ATTR2_PALBANK(1) | ATTR2_PRIO(1) | (40 + (mado->interacting > 16 ? 0 : (mado->interacting > 8 ? 4 : 8))));		// palbank 0, tile 0
-	obj_set_pos(mado->emote, mado->posX, mado->posY-16);
-      };
-      break;
+  switch (mado->interactionType) {
+  case Heart:
+    if (mado->interacting == 1) {
+      obj_set_attr(mado->emote,
+		   ATTR0_SQUARE,				// Square, regular sprite
+		   ATTR1_SIZE_16, 				// 64x64p,
+		   ATTR2_PALBANK(1) | ATTR2_PRIO(1) | 40);		// palbank 0, tile 0
+      obj_set_pos(mado->emote, mado->posX, mado->posY-16);
+      obj_hide(mado->emote);
     }
-    mado->interacting -=1;
-  };
-  
+    else {
+      obj_set_attr(mado->emote,
+		   ATTR0_SQUARE,				// Square, regular sprite
+		   ATTR1_SIZE_16, 				// 64x64p,
+		   ATTR2_PALBANK(1) | ATTR2_PRIO(1) | (40 + (mado->interacting > 16 ? 0 : (mado->interacting > 8 ? 4 : 8))));		// palbank 0, tile 0
+      obj_set_pos(mado->emote, mado->posX, mado->posY-16);
+    };
+    break;
+  }
+  mado->interacting -=1;  
   return 0;
 };
 
-int game_loop(Mado* mado) {
-  
+int mado_act(Mado* mado) {
+    if (teleport_to_map != InvalidMap) {
+      // Mado is teleporting
+    }
+
+    else if (mado->movement) {
+      // Mado is moving
+      turn_moving_mado(mado);
+      move_mado(mado);
+    }
+
+    else if (mado->interacting) {
+      // Mado is interacting
+      interact(mado);
+    }
+
+    else {
+    // Init action with priority on teleport then movement then interaction
+      teleport_to_map = tile_is_teleport(extract_tile_idx(bg0_map[(mado->posX/8) + 32*((mado->posY/8) + 2)]));
+      if (teleport_to_map == InvalidMap) {
+	init_interact(mado);
+
+	if (!mado->movement) {
+	  init_move_mado(mado);
+	};
+      };
+
+    };
+    return 0;
+    };    
+
+int game_loop(Mado* mado) {  
   while(1) {
     vid_vsync();
     key_poll();
-    move_mado(mado);
-    interact(mado);
+
+    mado_act(mado);
     
-    oam_copy(oam_mem, obj_buffer, 16);	// only need to update one
+    obj_set_pos(mado->sprite, mado->posX, mado->posY);
+    obj_set_pos(mado->emote, mado->posX, mado->posY-16);
+
+    oam_copy(oam_mem, obj_buffer, 20);	// only need to update one
 
     update_game_map();
     
