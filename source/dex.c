@@ -5,6 +5,62 @@ GameMap game_map = MadoBedroom;
 GameMap teleport_to_map = InvalidMap;
 int a_held = 0; 
 int rain_offset = 69;
+int fade_out = 0;
+int fade_in = 0;
+
+int fade_out_iter() {
+  u16 tileColor;
+  u16 spriteColor;
+  u16 tileR;
+  u16 tileB;
+  u16 tileG;
+  u16 spriteR;
+  u16 spriteB;
+  u16 spriteG;
+    
+  for (int i = 0; i < 256; i++) {
+    tileColor = pal_bg_mem[i];
+    spriteColor = pal_obj_mem[i];
+    tileR = (tileColor >> 10) & 0x1F;
+    tileB = (tileColor >> 5) & 0x1F;
+    tileG = tileColor & 0x1F;
+    spriteR = (spriteColor >> 10) & 0x1F;
+    spriteB = (spriteColor >> 5) & 0x1F;
+    spriteG = spriteColor & 0x1F;
+    
+    pal_bg_mem[i] = RGB15(tileR > 0 ? tileR-1 : 0, tileB > 0 ? tileB-1 : 0, tileG > 0 ? tileB-1 : 0);
+    pal_obj_mem[i] = RGB15(spriteR > 0 ? spriteR-1 : 0, spriteB > 0 ? spriteB-1 : 0, spriteG > 0 ? spriteB-1 : 0);
+      };
+  return 0;
+};
+
+int fade_in_iter() {
+  u16 tileColor;
+  u16 spriteColor;
+  u16 tileR;
+  u16 tileB;
+  u16 tileG;
+  u16 spriteR;
+  u16 spriteB;
+  u16 spriteG;
+    
+  for (int i = 0; i < 256; i++) {
+    tileColor = pal_bg_mem[i];
+    spriteColor = pal_obj_mem[i];
+    tileR = (tileColor >> 10) & 0x1F;
+    tileB = (tileColor >> 5) & 0x1F;
+    tileG = tileColor & 0x1F;
+    spriteR = (spriteColor >> 10) & 0x1F;
+    spriteB = (spriteColor >> 5) & 0x1F;
+    spriteG = spriteColor & 0x1F;
+    
+    pal_bg_mem[i] = RGB15(tileR > 30 ? 31 : tileR+1, tileB > 30 ? 31 : tileB+1, tileG > 30 ? 31 : tileG+1);
+    pal_obj_mem[i] = RGB15(spriteR > 30 ? 31 : spriteR+1, spriteB > 30 ? 31 : spriteB+1, spriteG > 30 ? 30 : spriteG+1);
+    
+      };
+  return 0;
+};
+
 
 int init_mado(Mado* mado, int x, int y) {
     // Mado Sprite
@@ -223,9 +279,39 @@ int interact(Mado* mado) {
   return 0;
 };
 
+
+int init_teleport() {
+  fade_out = 60;
+  fade_in = 60;
+  return 0;
+};
+
+int teleport(Mado* mado) {
+  if(fade_out) {
+    fade_out_iter();
+    fade_out--;
+  }
+
+  else if (fade_in) {
+    fade_in_iter();
+    fade_in--;
+  }
+
+  else {
+    game_map = teleport_to_map;
+    
+    init_game_map();
+    init_mado(mado, 96, 100);
+    teleport_to_map = InvalidMap;
+  };
+  return 0;
+};
+
+
 int mado_act(Mado* mado) {
     if (teleport_to_map != InvalidMap) {
       // Mado is teleporting
+      teleport(mado);
     }
 
     else if (mado->movement) {
@@ -242,12 +328,17 @@ int mado_act(Mado* mado) {
     else {
     // Init action with priority on teleport then movement then interaction
       teleport_to_map = tile_is_teleport(extract_tile_idx(bg0_map[(mado->posX/8) + 32*((mado->posY/8) + 2)]));
+      
       if (teleport_to_map == InvalidMap) {
 	init_interact(mado);
 
 	if (!mado->movement) {
 	  init_move_mado(mado);
 	};
+      }
+
+      else {
+	init_teleport();
       };
 
     };

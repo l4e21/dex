@@ -45,13 +45,13 @@ int tile_is_solid(int tile_idx) {
 
 GameMap mado_bedroom_tile_is_teleport(int tile_idx) {
   if (tile_idx == 49) {
-    return MadoAttic;
+    return MadoBedroom;
   }  
   if (tile_idx == 45) {
-    return MadoAttic;
+    return MadoBedroom;
   }  
   if (tile_idx == 47) {
-    return MadoAttic;
+    return MadoBedroom;
   }  
   return InvalidMap;
 };
@@ -187,12 +187,17 @@ int init_mado_bedroom() {
   return 0;
 };
 
+int init_mado_attic() {
+  return 0;
+};
+
 int init_game_map() {
   switch (game_map) {
   case MadoBedroom:
     init_mado_bedroom();
     break;
   case MadoAttic:
+    init_mado_attic();
     break;
   case InvalidMap:
     break;
