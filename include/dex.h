@@ -6,17 +6,6 @@
 #include <string.h>
 
 #include "game_map.h"
-#include "mado.h"
-#include "room.h"
-#include "bed.h"
-#include "rain.h"
-#include "emotes.h"
-
-#define CBB_0  0
-#define SBB_0 28
-
-#define CBB_1  1
-#define SBB_1 31
 
 OBJ_ATTR obj_buffer[128];
 OBJ_AFFINE *obj_aff_buffer= (OBJ_AFFINE*)obj_buffer;
