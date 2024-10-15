@@ -31,8 +31,8 @@ int mado_attic_tile_is_solid(int tile_idx) {
   return 0;  
 };
 
-int tile_is_solid(int tile_idx) {
-  switch (game_map) {
+int tile_is_solid(GameMap* game_map, int tile_idx) {
+  switch (*game_map) {
   case MadoBedroom:
     return mado_bedroom_tile_is_solid(tile_idx);
   case MadoAttic:
@@ -43,35 +43,53 @@ int tile_is_solid(int tile_idx) {
   return 0;
 };
 
-GameMap mado_bedroom_tile_is_teleport(int tile_idx) {
+
+
+
+
+
+int mado_bedroom_tile_is_teleport(Warp* warp, int tile_idx) {
   if (tile_idx == 49) {
-    return MadoBedroom;
+    warp->to_map = MadoBedroom;
+    warp->pos_x = 96;
+    warp->pos_y = 100;
   }  
   if (tile_idx == 45) {
-    return MadoBedroom;
+    warp->to_map = MadoBedroom;
+    warp->pos_x = 96;
+    warp->pos_y = 100;
   }  
   if (tile_idx == 47) {
-    return MadoBedroom;
+    warp->to_map = MadoBedroom;
+    warp->pos_x = 96;
+    warp->pos_y = 100;
   }  
-  return InvalidMap;
+  return 0;
 };
 
-GameMap mado_attic_tile_is_teleport(int tile_idx) {
-  return InvalidMap;
+int mado_attic_tile_is_teleport(Warp* warp, int tile_idx) {
+  warp->to_map = InvalidMap;
+  return 0;
 };
 
-GameMap tile_is_teleport(int tile_idx) {
-  switch (game_map) {
+int tile_is_teleport(GameMap* game_map, Warp* warp, int tile_idx) {
+  warp->to_map = InvalidMap;
+  switch (*game_map) {
   case MadoBedroom:
-    return mado_bedroom_tile_is_teleport(tile_idx);
+    mado_bedroom_tile_is_teleport(warp, tile_idx);
+    break;
   case MadoAttic:
-    return mado_attic_tile_is_teleport(tile_idx);
+    mado_attic_tile_is_teleport(warp, tile_idx);
+    break;
   case InvalidMap:
-    return InvalidMap;
+    break;
   };
 
-  return InvalidMap;
+  return 0;
 };
+
+
+
 
 int draw_mado_bedroom() {
   int row = 1;
@@ -168,11 +186,16 @@ int draw_mado_bedroom() {
   return 0;
 };
 
+
+
+
+
 int init_mado_bedroom() {
+  rain_offset = 69;
 
   // Room Tiles
-  dma3_cpy(&pal_bg_mem[0], roomPal, roomPalLen / sizeof(u16));
-  memcpy32(&tile_mem[CBB_0][1], roomTiles, roomTilesLen / sizeof(u32));
+  dma3_cpy(&pal_bg_mem[0], mado_bedroomPal, mado_bedroomPalLen / sizeof(u16));
+  memcpy32(&tile_mem[CBB_0][1], mado_bedroomTiles, mado_bedroomTilesLen / sizeof(u32));
 
   // Bed Tiles
   dma3_cpy(&pal_bg_mem[16], bedPal, bedPalLen / sizeof(u16));
@@ -191,8 +214,8 @@ int init_mado_attic() {
   return 0;
 };
 
-int init_game_map() {
-  switch (game_map) {
+int init_game_map(GameMap* game_map) {
+  switch (*game_map) {
   case MadoBedroom:
     init_mado_bedroom();
     break;
@@ -205,6 +228,10 @@ int init_game_map() {
   
   return 0;
 };
+
+
+
+
 
 int update_mado_bedroom() {
   if (time % 2 == 0) {
@@ -220,8 +247,8 @@ int update_mado_bedroom() {
   return 0;
 };
 
-int update_game_map() {
-  switch (game_map) {
+int update_game_map(GameMap* game_map) {
+  switch (*game_map) {
   case MadoBedroom:
     update_mado_bedroom();
     break;

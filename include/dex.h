@@ -13,15 +13,12 @@ OBJ_AFFINE *obj_aff_buffer= (OBJ_AFFINE*)obj_buffer;
 SCR_ENTRY *bg0_map= se_mem[SBB_0];
 SCR_ENTRY *bg1_map= se_mem[SBB_1];
 
-enum __DIRECTION {Left, Down, Up, Right, InvalidDirection};
-typedef enum __DIRECTION Direction;
-
 enum __INTERACTION {Heart};
 typedef enum __INTERACTION Interaction;
 
 struct __MADO {
-  int posX;
-  int posY;
+  int pos_x;
+  int pos_y;
   Direction facing;
   Interaction interactionType;
   int movement;

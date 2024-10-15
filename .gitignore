@@ -1,4 +1,5 @@
 build/*
+*:Zone.Identifier
 
 # Prerequisites
 *.d
