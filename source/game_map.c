@@ -35,8 +35,8 @@ int mado_attic_tile_is_solid(int tile_idx) {
   return (tile_idx == 0 || tile_idx == 1 || tile_idx == 2 || tile_idx == 3);
 };
 
-int tile_is_solid(GameMap* game_map, int tile_idx) {
-  switch (*game_map) {
+int tile_is_solid(GameMap game_map, int tile_idx) {
+  switch (game_map) {
   case MadoBedroom:
     return mado_bedroom_tile_is_solid(tile_idx);
   case MadoAttic:
@@ -76,9 +76,9 @@ int mado_attic_tile_is_teleport(Warp* warp, int tile_idx) {
   return 0;
 };
 
-int tile_is_teleport(GameMap* game_map, Warp* warp, int tile_idx) {
+int tile_is_teleport(GameMap game_map, Warp* warp, int tile_idx) {
   warp->to_map = InvalidMap;
-  switch (*game_map) {
+  switch (game_map) {
   case MadoBedroom:
     mado_bedroom_tile_is_teleport(warp, tile_idx);
     break;
@@ -195,8 +195,8 @@ int draw_mado_attic() {
   int col = 1;
   int tile_idx = 0;
   
-  for (int i=0; i<=20*40; i++) {
-    if (i % 40 == 0) {
+  for (int i=0; i<=20*32; i++) {
+    if (i % 32 == 0) {
       // Newline logic
       row ^= 1;
     };
@@ -205,6 +205,10 @@ int draw_mado_attic() {
     col ^= 1;
 
     tile_idx = 5;
+
+    if (i == 0) {
+      tile_idx = 13;
+    }
     
     bg0_map[i] = SE_PALBANK(0) | (tile_idx + col + row*2);
     
@@ -253,51 +257,13 @@ int init_mado_attic() {
   return 0;
 };
 
-int init_game_map(GameMap* game_map) {
-  switch (*game_map) {
+int init_game_map(GameMap game_map) {
+  switch (game_map) {
   case MadoBedroom:
     init_mado_bedroom();
     break;
   case MadoAttic:
     init_mado_attic();
-    break;
-  case InvalidMap:
-    break;
-  };
-  
-  return 0;
-};
-
-//
-// UPDATE LOGIC
-//
-
-
-int update_mado_bedroom() {
-  if (time % 2 == 0) {
-    rain_offset -= 4;
-    if (rain_offset < 0) {
-      rain_offset = 69;
-    };
-    // Less memory efficient, less granular, more VRAM bandwidth, less cpu usage, less complexity
-    // For other foregrounds, it might be better to go by index-based tile swapping
-    memcpy32(&tile_mem[CBB_1][rain_offset], rainTiles, rainTilesLen / sizeof(u32));
-  };
-
-  return 0;
-};
-
-int update_mado_attic() {
-  return 0;
-};
-
-int update_game_map(GameMap* game_map) {
-  switch (*game_map) {
-  case MadoBedroom:
-    update_mado_bedroom();
-    break;
-  case MadoAttic:
-    update_mado_attic();
     break;
   case InvalidMap:
     break;

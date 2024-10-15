@@ -7,6 +7,22 @@ int rain_offset;
 int fade_out = 0;
 int fade_in = 0;
 
+int camera_map_default(Camera* camera, GameMap game_map) {
+  switch (game_map) {
+  case MadoBedroom:
+    camera->behaviour = Static;
+    camera->pos_x = 0;
+    camera->pos_y = 0;
+    break;
+  case MadoAttic:
+    camera->behaviour = Following;
+    break;
+  case InvalidMap:
+    break;  
+  }
+  return 0;
+};
+
 int fade_out_iter() {
   u16 tileColor;
   u16 spriteColor;
@@ -66,8 +82,26 @@ int init_warp(Warp* warp) {
   return 0;
 };
 
+int init_camera(Camera* camera, Mado* mado) {
+  camera_map_default(camera, mado->game_map);
 
-int init_mado(Mado* mado, int x, int y) {
+  switch (camera->behaviour) {
+  case Static:
+    /* camera->pos_x = camera->pos_x; */
+    /* camera->pos_y = camera->pos_y; */
+    break;
+    
+  case Following:
+    camera->pos_x = mado->pos_x;
+    camera->pos_y = mado->pos_y;
+    break;
+
+  };
+  
+  return 0;
+};
+
+int init_mado(Mado* mado, int x, int y, GameMap game_map) {
     // Mado Sprite
   memcpy32(&tile_mem[4][0], madoTiles, madoTilesLen / sizeof(u32));
   dma3_cpy(pal_obj_mem, madoPal, madoPalLen / sizeof(u16));
@@ -83,14 +117,14 @@ int init_mado(Mado* mado, int x, int y) {
 	       ATTR1_SIZE_16, 				// 64x64p,
 	       ATTR2_PALBANK(0) | ATTR2_PRIO(1) | 0);		// palbank 0, tile 0
   
-  obj_set_pos(sprite, x, y);
+  /* obj_set_pos(sprite, x, y); */
 
   obj_set_attr(emote,
 	       ATTR0_SQUARE,				// Square, regular sprite
 	       ATTR1_SIZE_16, 				// 64x64p,
 	       ATTR2_PALBANK(1) | ATTR2_PRIO(1) | 40);		// palbank 0, tile 0
   
-  obj_set_pos(emote, x, y-64);
+  /* obj_set_pos(emote, x, y-64); */
   
   mado->facing = Down;
   mado->movement = 0;
@@ -98,6 +132,7 @@ int init_mado(Mado* mado, int x, int y) {
   mado->pos_y = y;
   mado->sprite = sprite;
   mado->emote = emote;
+  mado->game_map = game_map;
 
   return 0;
 };
@@ -159,36 +194,36 @@ int turn_moving_mado(Mado* mado) {
   return 0;
 };
 
-int mado_try_move(GameMap* game_map, Mado* mado) {
+int mado_try_move(Mado* mado) {
   // Mado's position is set to the top left of the sprite
   switch (mado->facing) {
   case Up:
-    if (!tile_is_solid(game_map, extract_tile_idx(bg0_map[(mado->pos_x/8) + 32*((mado->pos_y/8))]))
+    if (!tile_is_solid(mado->game_map, extract_tile_idx(bg0_map[(mado->pos_x/8) + 32*((mado->pos_y/8))]))
 	&&
-	!tile_is_solid(game_map, extract_tile_idx(bg0_map[((mado->pos_x/8)+1) + 32*((mado->pos_y/8))]))) {
+	!tile_is_solid(mado->game_map, extract_tile_idx(bg0_map[((mado->pos_x/8)+1) + 32*((mado->pos_y/8))]))) {
       mado->movement = 8;
     }
     break;
   case Down:
-    if(!tile_is_solid(game_map, extract_tile_idx(bg0_map[(mado->pos_x/8) + 32*((mado->pos_y/8) + 3)]))
+    if(!tile_is_solid(mado->game_map, extract_tile_idx(bg0_map[(mado->pos_x/8) + 32*((mado->pos_y/8) + 3)]))
        &&
-       !tile_is_solid(game_map, extract_tile_idx(bg0_map[((mado->pos_x/8) + 1) + 32*((mado->pos_y/8) + 3)]))
+       !tile_is_solid(mado->game_map, extract_tile_idx(bg0_map[((mado->pos_x/8) + 1) + 32*((mado->pos_y/8) + 3)]))
        ) {
       mado->movement = 8;
     }
     break; 
   case Left:
-    if(!tile_is_solid(game_map, extract_tile_idx(bg0_map[((mado->pos_x/8) - 1) + 32*((mado->pos_y/8) + 2)]))
+    if(!tile_is_solid(mado->game_map, extract_tile_idx(bg0_map[((mado->pos_x/8) - 1) + 32*((mado->pos_y/8) + 2)]))
        &&
-       !tile_is_solid(game_map, extract_tile_idx(bg0_map[((mado->pos_x/8) - 1) + 32*((mado->pos_y/8) + 2)]))
+       !tile_is_solid(mado->game_map, extract_tile_idx(bg0_map[((mado->pos_x/8) - 1) + 32*((mado->pos_y/8) + 2)]))
        ) {
       mado->movement = 8;
     }
     break;
   case Right:
-    if(!tile_is_solid(game_map, extract_tile_idx(bg0_map[((mado->pos_x/8) + 2) + 32*((mado->pos_y/8) + 2)]))
+    if(!tile_is_solid(mado->game_map, extract_tile_idx(bg0_map[((mado->pos_x/8) + 2) + 32*((mado->pos_y/8) + 2)]))
        &&
-       !tile_is_solid(game_map, extract_tile_idx(bg0_map[((mado->pos_x/8) + 2) + 32*((mado->pos_y/8) + 2)]))) {
+       !tile_is_solid(mado->game_map, extract_tile_idx(bg0_map[((mado->pos_x/8) + 2) + 32*((mado->pos_y/8) + 2)]))) {
       mado->movement = 8;
     }
     break;
@@ -198,22 +233,22 @@ int mado_try_move(GameMap* game_map, Mado* mado) {
   return 0;
 };
 
-int init_move_mado(GameMap* game_map, Mado* mado) {
+int init_move_mado(Mado* mado) {
     if (key_is_down(KEY_UP)) {
       mado->facing = Up;
-      mado_try_move(game_map, mado);
+      mado_try_move(mado);
     }    
     else if (key_is_down(KEY_DOWN)) {
       mado->facing = Down;
-      mado_try_move(game_map, mado);
+      mado_try_move(mado);
     }    
     else if (key_is_down(KEY_RIGHT)) {
       mado->facing = Right;
-      mado_try_move(game_map, mado);
+      mado_try_move(mado);
     }    
     else if (key_is_down(KEY_LEFT)) {
       mado->facing = Left;
-      mado_try_move(game_map, mado);
+      mado_try_move(mado);
     }
 
     turn_mado(mado);
@@ -268,7 +303,6 @@ int interact(Mado* mado) {
 		   ATTR0_SQUARE,				// Square, regular sprite
 		   ATTR1_SIZE_16, 				// 64x64p,
 		   ATTR2_PALBANK(1) | ATTR2_PRIO(1) | 40);		// palbank 0, tile 0
-      obj_set_pos(mado->emote, mado->pos_x, mado->pos_x-16);
       obj_hide(mado->emote);
     }
     else {
@@ -276,8 +310,7 @@ int interact(Mado* mado) {
 		   ATTR0_SQUARE,				// Square, regular sprite
 		   ATTR1_SIZE_16, 				// 64x64p,
 		   ATTR2_PALBANK(1) | ATTR2_PRIO(1) | (40 + (mado->interacting > 16 ? 0 : (mado->interacting > 8 ? 4 : 8))));		// palbank 0, tile 0
-      obj_set_pos(mado->emote, mado->pos_x, mado->pos_y-16);
-    };
+      };
     break;
   }
   mado->interacting -=1;  
@@ -291,7 +324,7 @@ int init_teleport(Warp* warp) {
   return 0;
 };
 
-int teleport(Mado* mado, Warp* warp, GameMap* game_map) {
+int teleport(Mado* mado, Warp* warp, Camera* camera) {
   if(fade_out) {
     fade_out_iter();
     fade_out--;
@@ -303,12 +336,11 @@ int teleport(Mado* mado, Warp* warp, GameMap* game_map) {
   }
 
   else {
-    warp->from_map = *game_map;
-    game_map = &warp->to_map;
-
-    // Initialise new map, move mado to correct place
-    init_game_map(game_map);
-    init_mado(mado, warp->pos_x, warp->pos_y);
+    // Re-initialise a lot of stuff
+    warp->from_map = mado->game_map;
+    init_game_map(warp->to_map);
+    init_mado(mado, warp->pos_x, warp->pos_y, warp->to_map);
+    init_camera(camera, mado);
     
     warp->to_map = InvalidMap;
   };
@@ -316,10 +348,10 @@ int teleport(Mado* mado, Warp* warp, GameMap* game_map) {
 };
 
 
-int mado_act(Mado* mado, Warp* warp, GameMap* game_map) {
+int mado_act(Mado* mado, Warp* warp, Camera* camera) {
     if (warp->to_map != InvalidMap) {
       // Mado is teleporting
-      teleport(mado, warp, game_map);
+      teleport(mado, warp, camera);
     }
 
     else if (mado->movement) {
@@ -335,13 +367,13 @@ int mado_act(Mado* mado, Warp* warp, GameMap* game_map) {
 
     else {
     // Init action with priority on teleport then movement then interaction
-      tile_is_teleport(game_map, warp, extract_tile_idx(bg0_map[(mado->pos_x/8) + 32*((mado->pos_y/8) + 2)]));
+      tile_is_teleport(mado->game_map, warp, extract_tile_idx(bg0_map[(mado->pos_x/8) + 32*((mado->pos_y/8) + 2)]));
       
       if (warp->to_map == InvalidMap) {
 	init_interact(mado);
 
 	if (!mado->movement) {
-	  init_move_mado(game_map, mado);
+	  init_move_mado(mado);
 	};
       }
 
@@ -351,21 +383,81 @@ int mado_act(Mado* mado, Warp* warp, GameMap* game_map) {
 
     };
     return 0;
-    };    
+    };
 
-int game_loop(Mado* mado, Warp* warp, GameMap* game_map) {  
+
+int update_mado_bedroom(Mado* mado) {
+  if (time % 2 == 0) {
+    rain_offset -= 4;
+    if (rain_offset < 0) {
+      rain_offset = 69;
+    };
+    // Less memory efficient, less granular, more VRAM bandwidth, less cpu usage, less complexity
+    // For other foregrounds, it might be better to go by index-based tile swapping
+    memcpy32(&tile_mem[CBB_1][rain_offset], rainTiles, rainTilesLen / sizeof(u32));
+  };
+
+  return 0;
+};
+
+int update_mado_attic(Mado* mado) {    
+  return 0;
+};
+
+int update_game_map(Mado* mado) {
+  switch (mado->game_map) {
+  case MadoBedroom:
+    update_mado_bedroom(mado);
+    break;
+  case MadoAttic:
+    update_mado_attic(mado);
+    break;
+  case InvalidMap:
+    break;
+  };
+  
+  return 0;
+};
+
+int update_camera(Camera* camera, Mado* mado) {
+  switch (camera->behaviour) {
+  case Static:
+    break;
+  case Following:
+    camera->pos_x = mado->pos_x - (SCREEN_WIDTH/2);
+    camera->pos_y = mado->pos_y - (SCREEN_HEIGHT/2); 
+ };
+
+  return 0;
+}
+
+int game_loop(Mado* mado, Warp* warp, Camera* camera) {  
   while(1) {
     vid_vsync();
     key_poll();
 
-    mado_act(mado, warp, game_map);
+    mado_act(mado, warp, camera);
+    update_camera(camera, mado);
+
+    REG_BG0HOFS= camera->pos_x;
+    REG_BG0VOFS= camera->pos_y;
+    REG_BG1HOFS= camera->pos_x;
+    REG_BG1VOFS= camera->pos_y;
     
-    obj_set_pos(mado->sprite, mado->pos_x, mado->pos_y);
-    obj_set_pos(mado->emote, mado->pos_x, mado->pos_y-16);
+    switch (camera->behaviour) {
+    case Static:
+      obj_set_pos(mado->sprite, mado->pos_x, mado->pos_y);
+      obj_set_pos(mado->emote, mado->pos_x, mado->pos_y-16);
+      break;
+    case Following:
+      obj_set_pos(mado->sprite, SCREEN_WIDTH/2, SCREEN_HEIGHT/2);
+      obj_set_pos(mado->emote, SCREEN_WIDTH/2, (SCREEN_HEIGHT/2)-16);
+      break;
+    };
 
     oam_copy(oam_mem, obj_buffer, 20);	// only need to update one
 
-    update_game_map(game_map);
+    update_game_map(mado);
     
     time++;
     
@@ -377,30 +469,26 @@ int main() {
 
   // Tile mode, bgs 0 (tiles), 1 (Foregrounds), later 2 (backgrounds)
   // For sprites, 
-  REG_DISPCNT= DCNT_MODE0 | DCNT_BG0 | DCNT_BG1 | DCNT_OBJ | DCNT_OBJ_1D;
+  REG_DISPCNT = DCNT_MODE0 | DCNT_BG0 | DCNT_BG1 | DCNT_OBJ | DCNT_OBJ_1D;
   
-  REG_BG0CNT= BG_CBB(CBB_0) | BG_SBB(SBB_0) | BG_REG_64x64 | BG_PRIO(1);
+  REG_BG0CNT = BG_CBB(CBB_0) | BG_SBB(SBB_0) | BG_REG_64x64 | BG_PRIO(1);
 
-  REG_BG1CNT= BG_CBB(CBB_1) | BG_SBB(SBB_1) | BG_REG_64x64 | BG_PRIO(0);
+  REG_BG1CNT = BG_CBB(CBB_1) | BG_SBB(SBB_1) | BG_REG_64x64 | BG_PRIO(0);
 
   
   // Position of screen on map
-  REG_BG0HOFS= 0;
-  REG_BG0VOFS= 0;
-
-  REG_BG1HOFS= 0;
-  REG_BG1VOFS= 0;
 
   oam_init(obj_buffer, 128);
 
   Mado mado = {0};
   Warp warp = {0};
-  GameMap game_map = MadoBedroom;
+  Camera camera = {0};
   
-  init_mado(&mado, 96, 100);
+  init_mado(&mado, 96, 100, MadoBedroom);
+  init_camera(&camera, &mado);
   init_warp(&warp);
-  init_game_map(&game_map);
+  init_game_map(mado.game_map);
   
-  game_loop(&mado, &warp, &game_map);
+  game_loop(&mado, &warp, &camera);
   
 };
