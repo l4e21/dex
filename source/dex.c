@@ -305,9 +305,11 @@ int teleport(Mado* mado, Warp* warp, GameMap* game_map) {
   else {
     warp->from_map = *game_map;
     game_map = &warp->to_map;
-    
+
+    // Initialise new map, move mado to correct place
     init_game_map(game_map);
     init_mado(mado, warp->pos_x, warp->pos_y);
+    
     warp->to_map = InvalidMap;
   };
   return 0;

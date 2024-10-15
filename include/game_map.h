@@ -6,6 +6,7 @@
 
 #include "mado.h"
 #include "mado_bedroom.h"
+#include "mado_attic.h"
 #include "bed.h"
 #include "rain.h"
 #include "emotes.h"

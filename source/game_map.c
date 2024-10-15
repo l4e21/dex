@@ -12,6 +12,10 @@ int draw_16_by_16(int idx, int pal, int tile_idx) {
   return 0;
 };
 
+//
+// SOLID TILES
+//
+
 int mado_bedroom_tile_is_solid(int tile_idx) {
   return (// Walls
 	  tile_idx == 9 || tile_idx == 10 || tile_idx == 11 || tile_idx == 12
@@ -28,7 +32,7 @@ int mado_bedroom_tile_is_solid(int tile_idx) {
 };
 
 int mado_attic_tile_is_solid(int tile_idx) {
-  return 0;  
+  return (tile_idx == 0 || tile_idx == 1 || tile_idx == 2 || tile_idx == 3);
 };
 
 int tile_is_solid(GameMap* game_map, int tile_idx) {
@@ -43,24 +47,24 @@ int tile_is_solid(GameMap* game_map, int tile_idx) {
   return 0;
 };
 
-
-
-
+//
+// TELEPORT
+//
 
 
 int mado_bedroom_tile_is_teleport(Warp* warp, int tile_idx) {
   if (tile_idx == 49) {
-    warp->to_map = MadoBedroom;
+    warp->to_map = MadoAttic;
     warp->pos_x = 96;
     warp->pos_y = 100;
   }  
   if (tile_idx == 45) {
-    warp->to_map = MadoBedroom;
+    warp->to_map = MadoAttic;
     warp->pos_x = 96;
     warp->pos_y = 100;
   }  
   if (tile_idx == 47) {
-    warp->to_map = MadoBedroom;
+    warp->to_map = MadoAttic;
     warp->pos_x = 96;
     warp->pos_y = 100;
   }  
@@ -186,8 +190,37 @@ int draw_mado_bedroom() {
   return 0;
 };
 
+int draw_mado_attic() {
+  int row = 1;
+  int col = 1;
+  int tile_idx = 0;
+  
+  for (int i=0; i<=20*40; i++) {
+    if (i % 40 == 0) {
+      // Newline logic
+      row ^= 1;
+    };
 
+    // Alternate tiles because 16 by 16
+    col ^= 1;
 
+    tile_idx = 5;
+    
+    bg0_map[i] = SE_PALBANK(0) | (tile_idx + col + row*2);
+    
+    // Fog Effect TODO
+    bg1_map[i] = 0;
+    /* if (i < 544 && i > 64 && (i % 32 > 2) && (i % 32 < 27)) { */
+    /* bg1_map[i] = SE_PALBANK(2) | (69 + col + row*2); */
+    /* }; */
+  };
+  
+  return 0;
+};
+
+//
+// INITIALISATION
+//
 
 
 int init_mado_bedroom() {
@@ -211,6 +244,12 @@ int init_mado_bedroom() {
 };
 
 int init_mado_attic() {
+  // Attic Tiles
+  dma3_cpy(&pal_bg_mem[0], mado_atticPal, mado_atticPalLen / sizeof(u16));
+  memcpy32(&tile_mem[CBB_0][0], mado_atticTiles, mado_atticTilesLen / sizeof(u32));
+
+  draw_mado_attic();
+  
   return 0;
 };
 
@@ -229,8 +268,9 @@ int init_game_map(GameMap* game_map) {
   return 0;
 };
 
-
-
+//
+// UPDATE LOGIC
+//
 
 
 int update_mado_bedroom() {
@@ -247,12 +287,17 @@ int update_mado_bedroom() {
   return 0;
 };
 
+int update_mado_attic() {
+  return 0;
+};
+
 int update_game_map(GameMap* game_map) {
   switch (*game_map) {
   case MadoBedroom:
     update_mado_bedroom();
     break;
   case MadoAttic:
+    update_mado_attic();
     break;
   case InvalidMap:
     break;
