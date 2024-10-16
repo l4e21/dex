@@ -45,8 +45,6 @@ extern int rain_offset;
 int extract_tile_idx(SCR_ENTRY tile);
 int draw_16_by_16(int idx, int pal, int tile_idx);
 
-int mado_bedroom_tile_is_solid(int tile_idx);
-int mado_attic_tile_is_solid(int tile_idx);
 int tile_is_solid(GameMap game_map, int tile_idx);
 
 int mado_bedroom_tile_is_teleport(Warp* warp, int tile_idx);

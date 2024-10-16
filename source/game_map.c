@@ -1,9 +1,14 @@
 #include "game_map.h"
 
+int mado_bedroom_solid_tiles[50] = {1,2,3,4,9,10,11,12,13,14,15,16,69,70,71,72,73,81,82,83,84,93,94,95,96,109,110,111,112};
+
+int mado_attic_solid_tiles[50] = {1,2,3,4};
+
 int extract_tile_idx(SCR_ENTRY tile) {
   return tile & SE_ID_MASK;
 }
 
+// Draw 16 by 16 tile on a 32 by 32 quadrant
 int draw_16_by_16(int idx, int pal, int tile_idx) {
   bg0_map[idx] = SE_PALBANK(pal) | tile_idx;
   bg0_map[idx+1] = SE_PALBANK(pal) | (tile_idx+1);
@@ -12,40 +17,26 @@ int draw_16_by_16(int idx, int pal, int tile_idx) {
   return 0;
 };
 
-//
-// SOLID TILES
-//
-
-int mado_bedroom_tile_is_solid(int tile_idx) {
-  return (// Walls
-	  tile_idx == 9 || tile_idx == 10 || tile_idx == 11 || tile_idx == 12
-	  || tile_idx == 13 || tile_idx == 14|| tile_idx == 15 || tile_idx == 16
-	  // Blackspace
-	  || tile_idx == 0 || tile_idx == 1 || tile_idx == 2 || tile_idx == 3 || tile_idx == 4
-	  // Beds
-	  || tile_idx == 69 || tile_idx == 70 || tile_idx == 71 || tile_idx == 72
-	  || tile_idx == 81 || tile_idx == 82 || tile_idx == 83 || tile_idx == 84
-	  || tile_idx == 93 || tile_idx == 94 || tile_idx == 95 || tile_idx == 96
-	  || tile_idx == 109 || tile_idx == 110 || tile_idx == 111 || tile_idx == 112
-
-	  );  
-};
-
-int mado_attic_tile_is_solid(int tile_idx) {
-  return (tile_idx == 0 || tile_idx == 1 || tile_idx == 2 || tile_idx == 3 || tile_idx == 4);
-};
-
 int tile_is_solid(GameMap game_map, int tile_idx) {
-  switch (game_map) {
-  case MadoBedroom:
-    return mado_bedroom_tile_is_solid(tile_idx);
-  case MadoAttic:
-    return mado_attic_tile_is_solid(tile_idx);
-  case InvalidMap:
-    return 0;
+  for (int i=0;i<50;i++) {
+    switch (game_map) {
+    case MadoBedroom:
+      if (tile_idx == mado_bedroom_solid_tiles[i]) {
+	return 1;
+      };
+      break;
+    case MadoAttic:
+      if (tile_idx == mado_attic_solid_tiles[i]) {
+	return 1;
+      };
+      break;
+    case InvalidMap:
+      return 0;
+    };
   };
+
   return 0;
-};
+}
 
 //
 // TELEPORT
@@ -92,8 +83,9 @@ int tile_is_teleport(GameMap game_map, Warp* warp, int tile_idx) {
   return 0;
 };
 
-
-
+//
+// DRAWING
+// For some reason, it does it in quadrants for 64 by 64 backgrounds
 
 int draw_mado_bedroom() {
   int row = 1;
@@ -191,71 +183,16 @@ int draw_mado_bedroom() {
 };
 
 int draw_mado_attic() {
-  int row = 1;
-  int col = 1;
-  int tile_idx = 0;
-  
-  // bg is 64 by 64 
-  for (int i=0; i<64*64; i++) {
-    if (i % 64 == 0) {
-      // Newline logic
-      row ^= 1;
+  for (int j=0; j<32;j++) {
+    for (int i=0; i<32;i++) {
+      for (int q=0; q<4; q++) {
+      draw_16_by_16(i*2 + 32*j*2 + 32*32*q, 0, 5);
+      };
     };
-
-    // Alternate tiles because 16 by 16
-    col ^= 1;
-
-    switch(i % 3) {
-    case 0:
-      tile_idx = 5;
-    };
-
-    switch(i % 47) {
-    case 0:
-      tile_idx = 9;
-    };
-
-    switch(i % 7) {
-    case 0:
-      tile_idx = 13;
-    };
-
-    switch(i % 11) {
-    case 0:
-      tile_idx = 17;
-    };
-
-    switch(i % 55) {
-    case 0:
-      tile_idx = 21;
-    };
-    
-    switch(i % 74) {
-    case 21:
-      tile_idx = 25;
-    };
-    
-   switch(i % 35) {
-    case 21:
-      tile_idx = 29;
-    };
-     
-    bg0_map[i] = SE_PALBANK(0) | (tile_idx + col + row*2);
-    
-    // Fog Effect TODO
-    /* bg1_map[i] = SE_PALBANK(2) | (69 + col + ; */
-    /* if (i < 544 && i > 64 && (i % 32 > 2) && (i % 32 < 27)) { */
-    /* }; */
   };
-
-  // Details
-  draw_16_by_16(32, 0, 33);
-  draw_16_by_16(34, 0, 37);
-  draw_16_by_16(36, 0, 41);
-  draw_16_by_16(38, 0, 45);
-  
   return 0;
 };
+
 
 //
 // INITIALISATION
@@ -265,6 +202,10 @@ int draw_mado_attic() {
 int init_mado_bedroom() {
   CBB_CLEAR(CBB_0);
   CBB_CLEAR(CBB_1);
+  CBB_CLEAR(CBB_2);
+  SBB_CLEAR(SBB_0);
+  SBB_CLEAR(SBB_1);
+  SBB_CLEAR(SBB_2);
   rain_offset = 69;
 
   // Room Tiles
@@ -287,6 +228,10 @@ int init_mado_bedroom() {
 int init_mado_attic() {
   CBB_CLEAR(CBB_0);
   CBB_CLEAR(CBB_1);
+  CBB_CLEAR(CBB_2);
+  SBB_CLEAR(SBB_0);
+  SBB_CLEAR(SBB_1);
+  SBB_CLEAR(SBB_2);
   // Attic Tiles
   dma3_cpy(&pal_bg_mem[0], mado_atticPal, mado_atticPalLen / sizeof(u16));
   memcpy32(&tile_mem[CBB_0][1], mado_atticTiles, mado_atticTilesLen / sizeof(u32));

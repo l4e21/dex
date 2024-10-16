@@ -494,10 +494,11 @@ int game_loop(Mado* mado, Warp* warp, Camera* camera) {
 int main() {
 
   // Tile mode, bgs 0 (tiles), 1 (Foregrounds), later 2 (backgrounds)
-  // For sprites, 
+  // For sprites,
+  
   REG_DISPCNT = DCNT_MODE0 | DCNT_BG0 | DCNT_BG1 | DCNT_BG2 | DCNT_OBJ | DCNT_OBJ_1D;
   
-  REG_BG0CNT = BG_CBB(CBB_0) | BG_SBB(SBB_0) | BG_REG_64x64 | BG_PRIO(2);
+  REG_BG0CNT = BG_CBB(CBB_0) | BG_SBB(SBB_0) | BG_PRIO(2) | BG_REG_64x64;
 
   REG_BG1CNT = BG_CBB(CBB_1) | BG_SBB(SBB_1) | BG_REG_64x64 | BG_PRIO(1);
 
@@ -511,7 +512,7 @@ int main() {
   Warp warp = {0};
   Camera camera = {0};
   
-  init_mado(&mado, 96, 100, MadoAttic);
+  init_mado(&mado, 96, 100, MadoBedroom);
   init_camera(&camera, &mado);
   init_warp(&warp);
   init_game_map(mado.game_map);
