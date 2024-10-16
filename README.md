@@ -4,10 +4,11 @@
 
 ## TODO
 
+- Large worlds (this requires tile streaming / chunking)
 - Fog foreground
 - Backgrounds
 - More emotes
-- More worlds (including looping worlds)
+- More worlds
 - Refactoring
 - Better debugging tools
 - Text menus
