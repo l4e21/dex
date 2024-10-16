@@ -21,7 +21,7 @@ int mado_bedroom_tile_is_solid(int tile_idx) {
 	  tile_idx == 9 || tile_idx == 10 || tile_idx == 11 || tile_idx == 12
 	  || tile_idx == 13 || tile_idx == 14|| tile_idx == 15 || tile_idx == 16
 	  // Blackspace
-	  || tile_idx == 0 || tile_idx == 1 || tile_idx == 2 || tile_idx == 3
+	  || tile_idx == 0 || tile_idx == 1 || tile_idx == 2 || tile_idx == 3 || tile_idx == 4
 	  // Beds
 	  || tile_idx == 69 || tile_idx == 70 || tile_idx == 71 || tile_idx == 72
 	  || tile_idx == 81 || tile_idx == 82 || tile_idx == 83 || tile_idx == 84
@@ -32,7 +32,7 @@ int mado_bedroom_tile_is_solid(int tile_idx) {
 };
 
 int mado_attic_tile_is_solid(int tile_idx) {
-  return (tile_idx == 0 || tile_idx == 1 || tile_idx == 2 || tile_idx == 3);
+  return (tile_idx == 0 || tile_idx == 1 || tile_idx == 2 || tile_idx == 3 || tile_idx == 4);
 };
 
 int tile_is_solid(GameMap game_map, int tile_idx) {
@@ -195,8 +195,9 @@ int draw_mado_attic() {
   int col = 1;
   int tile_idx = 0;
   
-  for (int i=0; i<=20*32; i++) {
-    if (i % 32 == 0) {
+  // bg is 64 by 64 
+  for (int i=0; i<64*64; i++) {
+    if (i % 64 == 0) {
       // Newline logic
       row ^= 1;
     };
@@ -204,20 +205,54 @@ int draw_mado_attic() {
     // Alternate tiles because 16 by 16
     col ^= 1;
 
-    tile_idx = 5;
+    switch(i % 3) {
+    case 0:
+      tile_idx = 5;
+    };
 
-    if (i == 0) {
+    switch(i % 47) {
+    case 0:
+      tile_idx = 9;
+    };
+
+    switch(i % 7) {
+    case 0:
       tile_idx = 13;
-    }
+    };
+
+    switch(i % 11) {
+    case 0:
+      tile_idx = 17;
+    };
+
+    switch(i % 55) {
+    case 0:
+      tile_idx = 21;
+    };
     
+    switch(i % 74) {
+    case 21:
+      tile_idx = 25;
+    };
+    
+   switch(i % 35) {
+    case 21:
+      tile_idx = 29;
+    };
+     
     bg0_map[i] = SE_PALBANK(0) | (tile_idx + col + row*2);
     
     // Fog Effect TODO
-    bg1_map[i] = 0;
+    /* bg1_map[i] = SE_PALBANK(2) | (69 + col + ; */
     /* if (i < 544 && i > 64 && (i % 32 > 2) && (i % 32 < 27)) { */
-    /* bg1_map[i] = SE_PALBANK(2) | (69 + col + row*2); */
     /* }; */
   };
+
+  // Details
+  draw_16_by_16(32, 0, 33);
+  draw_16_by_16(34, 0, 37);
+  draw_16_by_16(36, 0, 41);
+  draw_16_by_16(38, 0, 45);
   
   return 0;
 };
@@ -228,11 +263,13 @@ int draw_mado_attic() {
 
 
 int init_mado_bedroom() {
+  CBB_CLEAR(CBB_0);
+  CBB_CLEAR(CBB_1);
   rain_offset = 69;
 
   // Room Tiles
-  dma3_cpy(&pal_bg_mem[0], mado_bedroomPal, mado_bedroomPalLen / sizeof(u16));
-  memcpy32(&tile_mem[CBB_0][1], mado_bedroomTiles, mado_bedroomTilesLen / sizeof(u32));
+  dma3_cpy(pal_bg_mem, mado_bedroomPal, mado_bedroomPalLen / sizeof(u16));
+  memcpy32(&tile_mem[CBB_0][1], mado_bedroomTiles, mado_bedroomTilesLen / sizeof(u32)); /*  */
 
   // Bed Tiles
   dma3_cpy(&pal_bg_mem[16], bedPal, bedPalLen / sizeof(u16));
@@ -248,10 +285,12 @@ int init_mado_bedroom() {
 };
 
 int init_mado_attic() {
+  CBB_CLEAR(CBB_0);
+  CBB_CLEAR(CBB_1);
   // Attic Tiles
   dma3_cpy(&pal_bg_mem[0], mado_atticPal, mado_atticPalLen / sizeof(u16));
-  memcpy32(&tile_mem[CBB_0][0], mado_atticTiles, mado_atticTilesLen / sizeof(u32));
-
+  memcpy32(&tile_mem[CBB_0][1], mado_atticTiles, mado_atticTilesLen / sizeof(u32));
+  
   draw_mado_attic();
   
   return 0;

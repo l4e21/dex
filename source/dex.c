@@ -115,14 +115,14 @@ int init_mado(Mado* mado, int x, int y, GameMap game_map) {
   obj_set_attr(sprite,
 	       ATTR0_SQUARE,				// Square, regular sprite
 	       ATTR1_SIZE_16, 				// 64x64p,
-	       ATTR2_PALBANK(0) | ATTR2_PRIO(1) | 0);		// palbank 0, tile 0
+	       ATTR2_PALBANK(0) | ATTR2_PRIO(2) | 0);		// palbank 0, tile 0
   
   /* obj_set_pos(sprite, x, y); */
 
   obj_set_attr(emote,
 	       ATTR0_SQUARE,				// Square, regular sprite
 	       ATTR1_SIZE_16, 				// 64x64p,
-	       ATTR2_PALBANK(1) | ATTR2_PRIO(1) | 40);		// palbank 0, tile 0
+	       ATTR2_PALBANK(1) | ATTR2_PRIO(2) | 40);		// palbank 0, tile 0
   
   /* obj_set_pos(emote, x, y-64); */
   
@@ -142,25 +142,25 @@ int turn_mado(Mado* mado) {
     obj_set_attr(mado->sprite,
 		 ATTR0_SQUARE,		
 		 ATTR1_SIZE_16,      
-		 ATTR2_PALBANK(0) | ATTR2_PRIO(1) | 4);	      
+		 ATTR2_PALBANK(0) | ATTR2_PRIO(2) | 4);	      
   }
   else if (mado->facing == Down) {
     obj_set_attr(mado->sprite,
 		 ATTR0_SQUARE,		
 		 ATTR1_SIZE_16,      
-		 ATTR2_PALBANK(0) | ATTR2_PRIO(1) | 0);	      
+		 ATTR2_PALBANK(0) | ATTR2_PRIO(2) | 0);	      
   }
   else if (mado->facing == Right) {
     obj_set_attr(mado->sprite,
 		 ATTR0_SQUARE,		
 		 ATTR1_SIZE_16,      
-		 ATTR2_PALBANK(0) | ATTR2_PRIO(1) | 12);	      
+		 ATTR2_PALBANK(0) | ATTR2_PRIO(2) | 12);	      
   }
   else if (mado->facing == Left) {
     obj_set_attr(mado->sprite,
 		 ATTR0_SQUARE,		
 		 ATTR1_SIZE_16,      
-		 ATTR2_PALBANK(0) | ATTR2_PRIO(1) | 8);	      
+		 ATTR2_PALBANK(0) | ATTR2_PRIO(2) | 8);	      
   };
   return 0;
 };
@@ -171,25 +171,25 @@ int turn_moving_mado(Mado* mado) {
     obj_set_attr(mado->sprite,
 		 ATTR0_SQUARE,		
 		 ATTR1_SIZE_16,      
-		 ATTR2_PALBANK(0)  | ATTR2_PRIO(1) | (mado->movement < 4 ? 24 : 28));	      
+		 ATTR2_PALBANK(0)  | ATTR2_PRIO(2) | (mado->movement < 4 ? 24 : 28));	      
   }
   else if (mado->facing == Down) {
     obj_set_attr(mado->sprite,
 		 ATTR0_SQUARE,		
 		 ATTR1_SIZE_16,      
-		 ATTR2_PALBANK(0) | ATTR2_PRIO(1) | (mado->movement < 4 ? 16 : 20));	      
+		 ATTR2_PALBANK(0) | ATTR2_PRIO(2) | (mado->movement < 4 ? 16 : 20));	      
   }
   else if (mado->facing == Right) {
     obj_set_attr(mado->sprite,
 		 ATTR0_SQUARE,		
 		 ATTR1_SIZE_16,      
-		 ATTR2_PALBANK(0) | ATTR2_PRIO(1) | 36);	      
+		 ATTR2_PALBANK(0) | ATTR2_PRIO(2) | 36);	      
   }
   else if (mado->facing == Left) {
     obj_set_attr(mado->sprite,
 		 ATTR0_SQUARE,		
 		 ATTR1_SIZE_16,      
-		 ATTR2_PALBANK(0) | ATTR2_PRIO(1) | 32);	      
+		 ATTR2_PALBANK(0) | ATTR2_PRIO(2) | 32);	      
   };
   return 0;
 };
@@ -258,21 +258,42 @@ int init_move_mado(Mado* mado) {
 
 
 int move_mado(Mado* mado) {
+  // Wraparound Logic
   switch (mado->facing) {
   case Up:
+    if (mado->pos_y == 0) {
+      mado->pos_y = 512;
+    }
+    else {
     mado->pos_y -= 1;
+    };
     mado->movement -= 1;
     break;
   case Down:
+    if (mado->pos_y == 512) {
+      mado->pos_y = 0;
+    }
+    else {
     mado->pos_y += 1;
+    };
     mado->movement -= 1;
     break;
   case Left:
+    if (mado->pos_x == 0) {
+      mado->pos_x = 512;
+    }
+    else {
     mado->pos_x -= 1;
+    };
     mado->movement -= 1;
     break;
   case Right:
+    if (mado->pos_x == 512) {
+      mado->pos_x = 0;
+    }
+    else {
     mado->pos_x += 1;
+    };
     mado->movement -= 1;
     break;
 
@@ -341,7 +362,6 @@ int teleport(Mado* mado, Warp* warp, Camera* camera) {
     init_game_map(warp->to_map);
     init_mado(mado, warp->pos_x, warp->pos_y, warp->to_map);
     init_camera(camera, mado);
-    
     warp->to_map = InvalidMap;
   };
   return 0;
@@ -431,10 +451,14 @@ int update_camera(Camera* camera, Mado* mado) {
   return 0;
 }
 
-int game_loop(Mado* mado, Warp* warp, Camera* camera) {  
+int game_loop(Mado* mado, Warp* warp, Camera* camera) {
+  /* char textBuffer[20]; */
+  /* sprintf(textBuffer, "HI WORLD"); */
   while(1) {
     vid_vsync();
     key_poll();
+    /* tte_write("#{P:0,0}");        // Goto (72, 64). */
+    /* tte_write(textBuffer);      // Print "Hello world!" */
 
     mado_act(mado, warp, camera);
     update_camera(camera, mado);
@@ -443,6 +467,8 @@ int game_loop(Mado* mado, Warp* warp, Camera* camera) {
     REG_BG0VOFS= camera->pos_y;
     REG_BG1HOFS= camera->pos_x;
     REG_BG1VOFS= camera->pos_y;
+    /* REG_BG2HOFS= camera->pos_x; */
+    /* REG_BG2VOFS= camera->pos_y; */
     
     switch (camera->behaviour) {
     case Static:
@@ -469,14 +495,15 @@ int main() {
 
   // Tile mode, bgs 0 (tiles), 1 (Foregrounds), later 2 (backgrounds)
   // For sprites, 
-  REG_DISPCNT = DCNT_MODE0 | DCNT_BG0 | DCNT_BG1 | DCNT_OBJ | DCNT_OBJ_1D;
+  REG_DISPCNT = DCNT_MODE0 | DCNT_BG0 | DCNT_BG1 | DCNT_BG2 | DCNT_OBJ | DCNT_OBJ_1D;
   
-  REG_BG0CNT = BG_CBB(CBB_0) | BG_SBB(SBB_0) | BG_REG_64x64 | BG_PRIO(1);
+  REG_BG0CNT = BG_CBB(CBB_0) | BG_SBB(SBB_0) | BG_REG_64x64 | BG_PRIO(2);
 
-  REG_BG1CNT = BG_CBB(CBB_1) | BG_SBB(SBB_1) | BG_REG_64x64 | BG_PRIO(0);
+  REG_BG1CNT = BG_CBB(CBB_1) | BG_SBB(SBB_1) | BG_REG_64x64 | BG_PRIO(1);
 
+  REG_BG2CNT = BG_CBB(CBB_2) | BG_SBB(SBB_2) | BG_REG_64x64 | BG_PRIO(0);
   
-  // Position of screen on map
+  // position of screen on map
 
   oam_init(obj_buffer, 128);
 
@@ -484,11 +511,11 @@ int main() {
   Warp warp = {0};
   Camera camera = {0};
   
-  init_mado(&mado, 96, 100, MadoBedroom);
+  init_mado(&mado, 96, 100, MadoAttic);
   init_camera(&camera, &mado);
   init_warp(&warp);
   init_game_map(mado.game_map);
-  
+
   game_loop(&mado, &warp, &camera);
   
 };
