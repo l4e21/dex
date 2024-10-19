@@ -198,30 +198,30 @@ int mado_try_move(Mado* mado) {
   // Mado's position is set to the top left of the sprite
   switch (mado->facing) {
   case Up:
-    if (!tile_is_solid(mado->game_map, mado->pos_x/8 + 32*(mado->pos_y/8))
+    if (!tile_is_solid(mado->game_map, mado->pos_x/8, mado->pos_y/8)
 	&&
-	!tile_is_solid(mado->game_map, (mado->pos_x/8)+ 1 + 32*(mado->pos_y/8))) {
+	!tile_is_solid(mado->game_map, (mado->pos_x/8)+ 1, mado->pos_y/8)) {
       mado->movement = 8;
     }
     break;
   case Down:
-    if(!tile_is_solid(mado->game_map, mado->pos_x/8 + 32*((mado->pos_y/8) + 3))
+    if(!tile_is_solid(mado->game_map, mado->pos_x/8, (mado->pos_y/8) + 3)
        &&
-       !tile_is_solid(mado->game_map, (mado->pos_x/8) + 1 + 32*((mado->pos_y/8) + 3))) {
+       !tile_is_solid(mado->game_map, (mado->pos_x/8) + 1, (mado->pos_y/8) + 3)) {
       mado->movement = 8;
     }
     break;
   case Left:
-    if(!tile_is_solid(mado->game_map, (mado->pos_x/8) - 1 + 32*((mado->pos_y/8) + 2))
+    if(!tile_is_solid(mado->game_map, (mado->pos_x/8) - 1, (mado->pos_y/8) + 2)
        &&
-       !tile_is_solid(mado->game_map, (mado->pos_x/8) - 1 + 32*((mado->pos_y/8) + 2))) {
+       !tile_is_solid(mado->game_map, (mado->pos_x/8) - 1, (mado->pos_y/8) + 2)) {
       mado->movement = 8;
     }
     break;
   case Right:
-    if(!tile_is_solid(mado->game_map, (mado->pos_x/8) + 2 + 32*((mado->pos_y/8) + 2))
+    if(!tile_is_solid(mado->game_map, (mado->pos_x/8) + 2, (mado->pos_y/8) + 2)
        &&
-       !tile_is_solid(mado->game_map, (mado->pos_x/8) + 2 + 32*((mado->pos_y/8) + 2))) {
+       !tile_is_solid(mado->game_map, (mado->pos_x/8) + 2, (mado->pos_y/8) + 2)) {
       mado->movement = 8;
     }
     break;

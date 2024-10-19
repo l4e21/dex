@@ -34,9 +34,24 @@ int draw_16_by_16(int idx, int pal, int tile_idx, int bg) {
   return 0;
 };
 
-int tile_is_solid(GameMap game_map, int tile_pos) {
-  int tile_idx_3 = extract_tile_idx(bg3_map[tile_pos]);
-  int tile_idx_0 = extract_tile_idx(bg0_map[tile_pos]);
+int tile_is_solid(GameMap game_map, int x, int y) {
+  int quadrant;
+  
+  if (x > 32 && y > 32) {
+    quadrant = 3;
+  }
+  else if (x > 32) {
+    quadrant = 1;
+  } 
+  else if (y > 32) {
+    quadrant = 2;
+  }
+  else {
+    quadrant = 0;
+  };
+  
+  int tile_idx_3 = extract_tile_idx(bg3_map[(x % 32) + 32*(y % 32) + 32*32*quadrant]);
+  int tile_idx_0 = extract_tile_idx(bg0_map[(x % 32) + 32*(y % 32) + 32*32*quadrant]);
   
   for (int i=0;i<50;i++) {
     switch (game_map) {
