@@ -15,10 +15,13 @@
 #define SBB_0 28
 
 #define CBB_1  1
-#define SBB_1 30
+#define SBB_1 29
 
 #define CBB_2  2
-#define SBB_2 31
+#define SBB_2 30
+
+#define CBB_3  3
+#define SBB_3 31
 
 enum __GAME_MAP {InvalidMap, MadoBedroom, MadoAttic};
 typedef enum __GAME_MAP GameMap;

@@ -1,0 +1,367 @@
+#include "game_map.h"
+
+// 16 by 16
+int mado_bedroom_tile_map[32][32] = {{9, 9, 0, 9, 9, 0, 9, 9, 0, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9},
+				     {9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9},
+				     {9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9},
+				     {9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9},
+				     {9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9},
+				     {9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9},
+				     {9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9},
+				     {9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9},
+				     {9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9},
+				     {9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9},
+				     {9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9},
+				     {9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9},
+				     {9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9},
+				     {9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9},
+				     {9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9},
+				     {9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9},
+				     {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+				     {9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9},
+				     {9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9},
+				     {9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9},
+				     {9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9},
+				     {9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9},
+				     {9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9},
+				     {9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9},
+				     {9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9},
+				     {9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9},
+				     {9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9},
+				     {9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9},
+				     {9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9},
+				     {9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9},
+				     {9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9},
+				     {9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9}};
+
+int mado_attic_tile_map[32][32] = {};
+
+
+
+int mado_bedroom_solid_tiles[50] = {1, 2, 3, 4, 9, 10,
+				    11, 12, 13, 14, 15, 16,
+				    69, 70, 71, 72, 81, 82, 83, 84,
+				    93, 94, 95, 96, 109, 110, 111, 112};
+
+int mado_attic_solid_tiles[50] = {1, 2, 3, 4};
+
+
+int extract_tile_idx(SCR_ENTRY tile) {
+  return tile & SE_ID_MASK;
+}
+
+int draw_16_by_16(int idx, int pal, int tile_idx) {
+  bg0_map[idx] = SE_PALBANK(pal) | tile_idx;
+  bg0_map[idx+1] = SE_PALBANK(pal) | (tile_idx+1);
+  bg0_map[idx+32] = SE_PALBANK(pal) | (tile_idx+2);
+  bg0_map[idx+33] = SE_PALBANK(pal) | (tile_idx+3);
+  return 0;
+};
+
+
+int tile_is_solid(GameMap game_map, int tile_idx) {
+  for (int i=0;i<50;i++) {
+    switch (game_map) {
+    case MadoBedroom:
+      if (mado_bedroom_solid_tiles[i] == tile_idx) {
+	return 1;
+      };
+    case MadoAttic:
+      if (mado_attic_solid_tiles[i] == tile_idx) {
+	return 1;
+      };
+    case InvalidMap:
+      return 0;
+    };
+  };
+  return 0;
+};
+
+//
+// TELEPORT
+//
+
+
+int mado_bedroom_tile_is_teleport(Warp* warp, int tile_idx) {
+  if (tile_idx == 49) {
+    warp->to_map = MadoAttic;
+    warp->pos_x = 96;
+    warp->pos_y = 100;
+  }  
+  if (tile_idx == 45) {
+    warp->to_map = MadoAttic;
+    warp->pos_x = 96;
+    warp->pos_y = 100;
+  }  
+  if (tile_idx == 47) {
+    warp->to_map = MadoAttic;
+    warp->pos_x = 96;
+    warp->pos_y = 100;
+  }  
+  return 0;
+};
+
+int mado_attic_tile_is_teleport(Warp* warp, int tile_idx) {
+  warp->to_map = InvalidMap;
+  return 0;
+};
+
+int tile_is_teleport(GameMap game_map, Warp* warp, int tile_idx) {
+  warp->to_map = InvalidMap;
+  switch (game_map) {
+  case MadoBedroom:
+    mado_bedroom_tile_is_teleport(warp, tile_idx);
+    break;
+  case MadoAttic:
+    mado_attic_tile_is_teleport(warp, tile_idx);
+    break;
+  case InvalidMap:
+    break;
+  };
+
+  return 0;
+};
+
+//
+// draw
+//
+
+int draw_mado_bedroom() {
+  // 16 by 16
+  for (int i=0;i<32;i++) {
+    for (int j=0;j<32;j++) {
+      // Convert to 8 by 8
+      draw_16_by_16(i*2 + j*2*32, 0, 5);
+    };
+  };
+    
+  return 0;
+};
+
+int draw_mado_attic() {
+  // 16 by 16
+  for (int i=0;i<32;i++) {
+    for (int j=0;j<32;j++) {
+      // Convert to 8 by 8
+      draw_16_by_16(i*2 + j*2*16, 0, 5);
+    };
+  };
+    
+  return 0;
+};
+
+/* int draw_mado_bedroom() { */
+/*   int row = 1; */
+/*   int col = 1; */
+/*   int tile_idx = 0; */
+  
+/*   for (int i=0; i<=20*32; i++) { */
+/*     if (i % 32 == 0) { */
+/*       // Newline logic */
+/*       row ^= 1; */
+/*     }; */
+
+/*     // Alternate tiles because 16 by 16 */
+/*     col ^= 1; */
+
+/*     if ((i % 32 > 3) && (i % 32 < 26)) { */
+
+/*       if (i < 64) { */
+/* 	tile_idx = 0; */
+/*       } */
+
+/*       // Wall */
+/*       else if (i < 128) { */
+/* 	tile_idx = 9; */
+/*       } */
+
+/*       // Wall */
+/*       else if (i < 192) { */
+/* 	tile_idx = 13; */
+/*       } */
+      
+/*       // Floor */
+/*       else if (i < 544) { */
+/* 	tile_idx = 17; */
+/*       } */
+
+/*       else { */
+/* 	tile_idx = 0; */
+/*       } */
+      
+/*     } */
+
+/*     else { */
+/*       tile_idx = 0; */
+/*     }; */
+
+/*     bg0_map[i] = SE_PALBANK(0) | (tile_idx + col + row*2); */
+
+/*     if (i < 544 && i > 64 && (i % 32 > 2) && (i % 32 < 27)) { */
+/*     bg1_map[i] = SE_PALBANK(2) | (69 + col + row*2); */
+/*     }; */
+/*   }; */
+
+/*   // Details */
+
+/*   // Bed L */
+/*   draw_16_by_16(198, 1, 65); */
+/*   draw_16_by_16(200, 1, 69); */
+/*   draw_16_by_16(202, 1, 73); */
+  
+/*   draw_16_by_16(262, 1, 77); */
+/*   draw_16_by_16(264, 1, 81); */
+/*   draw_16_by_16(266, 1, 85); */
+
+/*   draw_16_by_16(328, 1, 101); */
+  
+/*   // Bed R */
+/*   draw_16_by_16(210, 1, 89); */
+/*   draw_16_by_16(212, 1, 93); */
+/*   draw_16_by_16(214, 1, 97); */
+  
+/*   draw_16_by_16(274, 1, 105); */
+/*   draw_16_by_16(276, 1, 109); */
+/*   draw_16_by_16(278, 1, 85); */
+
+/*   draw_16_by_16(340, 1, 101); */
+  
+
+/*   // Stairs */
+/*   draw_16_by_16(342, 0, 41); */
+/*   draw_16_by_16(344, 0, 45); */
+/*   draw_16_by_16(408, 0, 49); */
+/*   draw_16_by_16(406, 0, 53); */
+/*   draw_16_by_16(280, 0, 57); */
+
+/*   // Cracks etc */
+/*   draw_16_by_16(432, 0, 25); */
+/*   /\* draw_16_by_16(408, 0, 29); *\/ */
+/*   draw_16_by_16(470, 0, 33); */
+/*   draw_16_by_16(240, 0, 37); */
+/*   draw_16_by_16(110, 0, 5); */
+/*   draw_16_by_16(400, 0, 29); */
+  
+/*   return 0; */
+/* }; */
+
+/* int draw_mado_attic() { */
+/*   int row = 1; */
+/*   int col = 1; */
+/*   int tile_idx = 0; */
+  
+/*   // bg is 64 by 64  */
+/*   for (int i=0; i<64*64; i++) { */
+/*     if (i % 64 == 0) { */
+/*       // Newline logic */
+/*       row ^= 1; */
+/*     }; */
+
+/*     // Alternate tiles because 16 by 16 */
+/*     col ^= 1; */
+
+/*     switch(i % 3) { */
+/*     case 0: */
+/*       tile_idx = 5; */
+/*     }; */
+
+/*     switch(i % 47) { */
+/*     case 0: */
+/*       tile_idx = 9; */
+/*     }; */
+
+/*     switch(i % 7) { */
+/*     case 0: */
+/*       tile_idx = 13; */
+/*     }; */
+
+/*     switch(i % 11) { */
+/*     case 0: */
+/*       tile_idx = 17; */
+/*     }; */
+
+/*     switch(i % 55) { */
+/*     case 0: */
+/*       tile_idx = 21; */
+/*     }; */
+    
+/*     switch(i % 74) { */
+/*     case 21: */
+/*       tile_idx = 25; */
+/*     }; */
+    
+/*    switch(i % 35) { */
+/*     case 21: */
+/*       tile_idx = 29; */
+/*     }; */
+     
+/*     bg0_map[i] = SE_PALBANK(0) | (tile_idx + col + row*2); */
+    
+/*     // Fog Effect TODO */
+/*     /\* bg1_map[i] = SE_PALBANK(2) | (69 + col + ; *\/ */
+/*     /\* if (i < 544 && i > 64 && (i % 32 > 2) && (i % 32 < 27)) { *\/ */
+/*     /\* }; *\/ */
+/*   }; */
+
+/*   // Details */
+/*   draw_16_by_16(32, 0, 33); */
+/*   draw_16_by_16(34, 0, 37); */
+/*   draw_16_by_16(36, 0, 41); */
+/*   draw_16_by_16(38, 0, 45); */
+  
+/*   return 0; */
+/* }; */
+
+//
+// INITIALISATION
+//
+
+
+int init_mado_bedroom() {
+  CBB_CLEAR(CBB_0);
+  CBB_CLEAR(CBB_1);
+  rain_offset = 69;
+
+  // Room Tiles
+  dma3_cpy(pal_bg_mem, mado_bedroomPal, mado_bedroomPalLen / sizeof(u16));
+  memcpy32(&tile_mem[CBB_0][1], mado_bedroomTiles, mado_bedroomTilesLen / sizeof(u32)); /*  */
+
+  // Bed Tiles
+  dma3_cpy(&pal_bg_mem[16], bedPal, bedPalLen / sizeof(u16));
+  memcpy32(&tile_mem[CBB_0][61], bedTiles, bedTilesLen / sizeof(u32));
+
+  // Rain Tiles
+  dma3_cpy(&pal_bg_mem[32], rainPal, rainPalLen / sizeof(u16));
+  memcpy32(&tile_mem[CBB_1][1], rainTiles, rainTilesLen / sizeof(u32));
+  
+  draw_mado_bedroom();
+
+  return 0;
+};
+
+int init_mado_attic() {
+  CBB_CLEAR(CBB_0);
+  CBB_CLEAR(CBB_1);
+  // Attic Tiles
+  dma3_cpy(&pal_bg_mem[0], mado_atticPal, mado_atticPalLen / sizeof(u16));
+  memcpy32(&tile_mem[CBB_0][1], mado_atticTiles, mado_atticTilesLen / sizeof(u32));
+  
+  draw_mado_attic();
+  
+  return 0;
+};
+
+int init_game_map(GameMap game_map) {
+  switch (game_map) {
+  case MadoBedroom:
+    init_mado_bedroom();
+    break;
+  case MadoAttic:
+    init_mado_attic();
+    break;
+  case InvalidMap:
+    break;
+  };
+  
+  return 0;
+};

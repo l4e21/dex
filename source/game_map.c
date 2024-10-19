@@ -198,14 +198,21 @@ int draw_mado_attic() {
 // INITIALISATION
 //
 
-
-int init_mado_bedroom() {
+int clear_all() {
   CBB_CLEAR(CBB_0);
   CBB_CLEAR(CBB_1);
   CBB_CLEAR(CBB_2);
   SBB_CLEAR(SBB_0);
   SBB_CLEAR(SBB_1);
   SBB_CLEAR(SBB_2);
+
+  return 0;
+};
+
+
+int init_mado_bedroom() {
+  clear_all();
+  
   rain_offset = 69;
 
   // Room Tiles
@@ -226,12 +233,8 @@ int init_mado_bedroom() {
 };
 
 int init_mado_attic() {
-  CBB_CLEAR(CBB_0);
-  CBB_CLEAR(CBB_1);
-  CBB_CLEAR(CBB_2);
-  SBB_CLEAR(SBB_0);
-  SBB_CLEAR(SBB_1);
-  SBB_CLEAR(SBB_2);
+  clear_all();
+
   // Attic Tiles
   dma3_cpy(&pal_bg_mem[0], mado_atticPal, mado_atticPalLen / sizeof(u16));
   memcpy32(&tile_mem[CBB_0][1], mado_atticTiles, mado_atticTilesLen / sizeof(u32));
