@@ -89,57 +89,22 @@ int draw_mado_bedroom() {
       draw_16_by_16(i*2 + j*32*2, 0, mado_bedroom_tile_map[j][i]);
     };
   };
-  /* int row = 1; */
-  /* int col = 1; */
-  /* int tile_idx = 0; */
+  int row = 1;
+  int col = 1;
   
-  /* for (int i=0; i<=20*32; i++) { */
-  /*   if (i % 32 == 0) { */
-  /*     // Newline logic */
-  /*     row ^= 1; */
-  /*   }; */
+  for (int i=0; i<=20*32; i++) {
+    if (i % 32 == 0) {
+      // Newline logic
+      row ^= 1;
+    };
 
-  /*   // Alternate tiles because 16 by 16 */
-  /*   col ^= 1; */
+    // alternate tiles because 16 by 16
+    col ^= 1;
 
-  /*   if ((i % 32 > 3) && (i % 32 < 26)) { */
-
-  /*     if (i < 64) { */
-  /* 	tile_idx = 0; */
-  /*     } */
-
-  /*     // Wall */
-  /*     else if (i < 128) { */
-  /* 	tile_idx = 9; */
-  /*     } */
-
-  /*     // Wall */
-  /*     else if (i < 192) { */
-  /* 	tile_idx = 13; */
-  /*     } */
-      
-  /*     // Floor */
-  /*     else if (i < 544) { */
-  /* 	tile_idx = 17; */
-  /*     } */
-
-  /*     else { */
-  /* 	tile_idx = 0; */
-  /*     } */
-      
-  /*   } */
-
-  /*   else { */
-  /*     tile_idx = 0; */
-  /*   }; */
-
-  /*   bg0_map[i] = SE_PALBANK(0) | (tile_idx + col + row*2); */
-
-  /*   if (i < 544 && i > 64 && (i % 32 > 2) && (i % 32 < 27)) { */
-  /*   bg1_map[i] = SE_PALBANK(2) | (69 + col + row*2); */
-  /*   }; */
-  /* }; */
-
+    if (i < 544 && i > 32 && (i % 32 > 2) && (i % 32 < 27)) {
+    bg1_map[i] = SE_PALBANK(2) | (69 + col + row*2);
+    };
+  };
   // Details
 
   // Bed L
