@@ -107,22 +107,22 @@ int init_mado(Mado* mado, int x, int y, GameMap game_map) {
   dma3_cpy(pal_obj_mem, madoPal, madoPalLen / sizeof(u16));
 
   // Emotes Sprite
-  memcpy32(&tile_mem[4][40], emotesTiles, emotesTilesLen / sizeof(u32));
+  memcpy32(&tile_mem[4][160], emotesTiles, emotesTilesLen / sizeof(u32));
   dma3_cpy(&pal_obj_mem[16], emotesPal, emotesPalLen/ sizeof(u16));
 
   OBJ_ATTR *sprite = &obj_buffer[0];
   OBJ_ATTR *emote = &obj_buffer[1];
   obj_set_attr(sprite,
 	       ATTR0_SQUARE,				// Square, regular sprite
-	       ATTR1_SIZE_16, 				// 64x64p,
-	       ATTR2_PALBANK(0) | ATTR2_PRIO(1) | 0);		// palbank 0, tile 0
+	       ATTR1_SIZE_32, 				// 64x64p,
+	       ATTR2_PALBANK(0) | ATTR2_PRIO(2) | 0);		// palbank 0, tile 0
   
   /* obj_set_pos(sprite, x, y); */
 
   obj_set_attr(emote,
 	       ATTR0_SQUARE,				// Square, regular sprite
 	       ATTR1_SIZE_16, 				// 64x64p,
-	       ATTR2_PALBANK(1) | ATTR2_PRIO(1) | 40);		// palbank 0, tile 0
+	       ATTR2_PALBANK(1) | ATTR2_PRIO(2) | 160);		// palbank 0, tile 0
   
   /* obj_set_pos(emote, x, y-64); */
   
@@ -141,26 +141,26 @@ int turn_mado(Mado* mado) {
   if (mado->facing == Up) {
     obj_set_attr(mado->sprite,
 		 ATTR0_SQUARE,		
-		 ATTR1_SIZE_16,      
-		 ATTR2_PALBANK(0) | ATTR2_PRIO(1) | 4);	      
+		 ATTR1_SIZE_32,      
+		 ATTR2_PALBANK(0) | ATTR2_PRIO(2) | 16);	      
   }
   else if (mado->facing == Down) {
     obj_set_attr(mado->sprite,
 		 ATTR0_SQUARE,		
-		 ATTR1_SIZE_16,      
-		 ATTR2_PALBANK(0) | ATTR2_PRIO(1) | 0);	      
+		 ATTR1_SIZE_32,      
+		 ATTR2_PALBANK(0) | ATTR2_PRIO(2) | 0);	      
   }
   else if (mado->facing == Right) {
     obj_set_attr(mado->sprite,
 		 ATTR0_SQUARE,		
-		 ATTR1_SIZE_16,      
-		 ATTR2_PALBANK(0) | ATTR2_PRIO(1) | 12);	      
+		 ATTR1_SIZE_32,      
+		 ATTR2_PALBANK(0) | ATTR2_PRIO(2) | 48);	      
   }
   else if (mado->facing == Left) {
     obj_set_attr(mado->sprite,
 		 ATTR0_SQUARE,		
-		 ATTR1_SIZE_16,      
-		 ATTR2_PALBANK(0) | ATTR2_PRIO(1) | 8);	      
+		 ATTR1_SIZE_32,      
+		 ATTR2_PALBANK(0) | ATTR2_PRIO(2) | 32);	      
   };
   return 0;
 };
@@ -170,26 +170,26 @@ int turn_moving_mado(Mado* mado) {
   if (mado->facing == Up) {
     obj_set_attr(mado->sprite,
 		 ATTR0_SQUARE,		
-		 ATTR1_SIZE_16,      
-		 ATTR2_PALBANK(0)  | ATTR2_PRIO(1) | (mado->movement < 4 ? 24 : 28));	      
+		 ATTR1_SIZE_32,      
+		 ATTR2_PALBANK(0)  | ATTR2_PRIO(2) | (mado->movement < 4 ? 96 : 112));	      
   }
   else if (mado->facing == Down) {
     obj_set_attr(mado->sprite,
 		 ATTR0_SQUARE,		
-		 ATTR1_SIZE_16,      
-		 ATTR2_PALBANK(0) | ATTR2_PRIO(1) | (mado->movement < 4 ? 16 : 20));	      
+		 ATTR1_SIZE_32,      
+		 ATTR2_PALBANK(0) | ATTR2_PRIO(2) | (mado->movement < 4 ? 64 : 80));	      
   }
   else if (mado->facing == Right) {
     obj_set_attr(mado->sprite,
 		 ATTR0_SQUARE,		
-		 ATTR1_SIZE_16,      
-		 ATTR2_PALBANK(0) | ATTR2_PRIO(1) | 36);	      
+		 ATTR1_SIZE_32,      
+		 ATTR2_PALBANK(0) | ATTR2_PRIO(2) | 144);	      
   }
   else if (mado->facing == Left) {
     obj_set_attr(mado->sprite,
 		 ATTR0_SQUARE,		
-		 ATTR1_SIZE_16,      
-		 ATTR2_PALBANK(0) | ATTR2_PRIO(1) | 32);	      
+		 ATTR1_SIZE_32,      
+		 ATTR2_PALBANK(0) | ATTR2_PRIO(2) | 128);	      
   };
   return 0;
 };
@@ -321,14 +321,14 @@ int interact(Mado* mado) {
       obj_set_attr(mado->emote,
 		   ATTR0_SQUARE,				// Square, regular sprite
 		   ATTR1_SIZE_16, 				// 64x64p,
-		   ATTR2_PALBANK(1) | ATTR2_PRIO(1) | 40);		// palbank 0, tile 0
+		   ATTR2_PALBANK(1) | ATTR2_PRIO(2) | 160);		// palbank 0, tile 0
       obj_hide(mado->emote);
     }
     else {
       obj_set_attr(mado->emote,
 		   ATTR0_SQUARE,				// Square, regular sprite
 		   ATTR1_SIZE_16, 				// 64x64p,
-		   ATTR2_PALBANK(1) | ATTR2_PRIO(1) | (40 + (mado->interacting > 16 ? 0 : (mado->interacting > 8 ? 4 : 8))));		// palbank 0, tile 0
+		   ATTR2_PALBANK(1) | ATTR2_PRIO(2) | (160 + (mado->interacting > 16 ? 0 : (mado->interacting > 8 ? 4 : 8))));		// palbank 0, tile 0
       };
     break;
   }

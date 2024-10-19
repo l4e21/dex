@@ -50,18 +50,17 @@ int tile_is_solid(GameMap game_map, int x, int y) {
     quadrant = 0;
   };
   
-  int tile_idx_3 = extract_tile_idx(bg3_map[(x % 32) + 32*(y % 32) + 32*32*quadrant]);
-  int tile_idx_0 = extract_tile_idx(bg0_map[(x % 32) + 32*(y % 32) + 32*32*quadrant]);
+  int tile_idx = extract_tile_idx(bg0_map[(x % 32) + 32*(y % 32) + 32*32*quadrant]);
   
   for (int i=0;i<50;i++) {
     switch (game_map) {
     case MadoBedroom:
-      if ((tile_idx_0 && tile_idx_0 == mado_bedroom_solid_tiles[i]) || (tile_idx_3 && tile_idx_3 == mado_bedroom_3_solid_tiles[i])) {
+      if (tile_idx && tile_idx == mado_bedroom_solid_tiles[i]) {
 	return 1;
       };
       break;
     case MadoAttic:
-      if ((tile_idx_0 && tile_idx_0 == mado_attic_solid_tiles[i])) {
+      if (tile_idx && tile_idx == mado_attic_solid_tiles[i]) {
 	return 1;
       };
       break;
@@ -129,33 +128,38 @@ int draw_mado_bedroom() {
       draw_16_by_16(i*2 + j*32*2, 0, mado_bedroom_tile_map[j][i], 0);
       /*  */
       // Foreground
-      if (i > 0 && i < 13 && j < 9) {
+      if (i > 1 && i < 12 && j < 9) {
 	draw_16_by_16(i*2+1 + j*32*2, 2, 69, 1);
       };
     };
   };
     
   // Bed L
-  draw_16_by_16(198, 1, 5, 3);
-  draw_16_by_16(200, 1, 9, 3);
-  draw_16_by_16(202, 1, 13, 3);
+  draw_16_by_16(200, 1, 73, 0);
+  draw_16_by_16(202, 1, 77, 0);
+  draw_16_by_16(204, 1, 81, 0);
   
-  draw_16_by_16(262, 1, 17, 3);
-  draw_16_by_16(264, 1, 21, 3);
-  draw_16_by_16(266, 1, 25, 3);
+  draw_16_by_16(264, 1, 85, 0);
+  draw_16_by_16(266, 1, 89, 0);
+  draw_16_by_16(268, 1, 93, 0);
 
-  draw_16_by_16(328, 1, 41, 3);
+  draw_16_by_16(330, 1, 109, 0);
   
-  /* // Bed R */
-  draw_16_by_16(210, 1, 29, 3);
-  draw_16_by_16(212, 1, 33, 3);
-  draw_16_by_16(214, 1, 37, 3);
+  // Bed R
+  draw_16_by_16(208, 1, 97, 0);
+  draw_16_by_16(210, 1, 101, 0);
+  draw_16_by_16(212, 1, 105, 0);
   
-  draw_16_by_16(274, 1, 45, 3);
-  draw_16_by_16(276, 1, 49, 3);
-  draw_16_by_16(278, 1, 25, 3);
+  draw_16_by_16(272, 1, 113, 0);
+  draw_16_by_16(274, 1, 117, 0);
+  draw_16_by_16(276, 1, 93, 0);
 
-  draw_16_by_16(340, 1, 41, 3);
+  draw_16_by_16(338, 1, 109, 0);
+
+  // Window
+  draw_16_by_16(110, 0, 5, 0);
+  draw_16_by_16(454, 0, 61, 0);
+  
   
   return 0;
 };
@@ -202,7 +206,7 @@ int init_mado_bedroom() {
 
   // Bed Tiles, decoration layer
   dma3_cpy(&pal_bg_mem[16], bedPal, bedPalLen / sizeof(u16));
-  memcpy32(&tile_mem[CBB_3][1], bedTiles, bedTilesLen / sizeof(u32));
+  memcpy32(&tile_mem[CBB_0][69], bedTiles, bedTilesLen / sizeof(u32));
 
   // Rain Tiles, foreground layer
   dma3_cpy(&pal_bg_mem[32], rainPal, rainPalLen / sizeof(u16));
