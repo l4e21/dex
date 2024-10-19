@@ -115,14 +115,14 @@ int init_mado(Mado* mado, int x, int y, GameMap game_map) {
   obj_set_attr(sprite,
 	       ATTR0_SQUARE,				// Square, regular sprite
 	       ATTR1_SIZE_16, 				// 64x64p,
-	       ATTR2_PALBANK(0) | ATTR2_PRIO(2) | 0);		// palbank 0, tile 0
+	       ATTR2_PALBANK(0) | ATTR2_PRIO(1) | 0);		// palbank 0, tile 0
   
   /* obj_set_pos(sprite, x, y); */
 
   obj_set_attr(emote,
 	       ATTR0_SQUARE,				// Square, regular sprite
 	       ATTR1_SIZE_16, 				// 64x64p,
-	       ATTR2_PALBANK(1) | ATTR2_PRIO(2) | 40);		// palbank 0, tile 0
+	       ATTR2_PALBANK(1) | ATTR2_PRIO(1) | 40);		// palbank 0, tile 0
   
   /* obj_set_pos(emote, x, y-64); */
   
@@ -142,25 +142,25 @@ int turn_mado(Mado* mado) {
     obj_set_attr(mado->sprite,
 		 ATTR0_SQUARE,		
 		 ATTR1_SIZE_16,      
-		 ATTR2_PALBANK(0) | ATTR2_PRIO(2) | 4);	      
+		 ATTR2_PALBANK(0) | ATTR2_PRIO(1) | 4);	      
   }
   else if (mado->facing == Down) {
     obj_set_attr(mado->sprite,
 		 ATTR0_SQUARE,		
 		 ATTR1_SIZE_16,      
-		 ATTR2_PALBANK(0) | ATTR2_PRIO(2) | 0);	      
+		 ATTR2_PALBANK(0) | ATTR2_PRIO(1) | 0);	      
   }
   else if (mado->facing == Right) {
     obj_set_attr(mado->sprite,
 		 ATTR0_SQUARE,		
 		 ATTR1_SIZE_16,      
-		 ATTR2_PALBANK(0) | ATTR2_PRIO(2) | 12);	      
+		 ATTR2_PALBANK(0) | ATTR2_PRIO(1) | 12);	      
   }
   else if (mado->facing == Left) {
     obj_set_attr(mado->sprite,
 		 ATTR0_SQUARE,		
 		 ATTR1_SIZE_16,      
-		 ATTR2_PALBANK(0) | ATTR2_PRIO(2) | 8);	      
+		 ATTR2_PALBANK(0) | ATTR2_PRIO(1) | 8);	      
   };
   return 0;
 };
@@ -171,25 +171,25 @@ int turn_moving_mado(Mado* mado) {
     obj_set_attr(mado->sprite,
 		 ATTR0_SQUARE,		
 		 ATTR1_SIZE_16,      
-		 ATTR2_PALBANK(0)  | ATTR2_PRIO(2) | (mado->movement < 4 ? 24 : 28));	      
+		 ATTR2_PALBANK(0)  | ATTR2_PRIO(1) | (mado->movement < 4 ? 24 : 28));	      
   }
   else if (mado->facing == Down) {
     obj_set_attr(mado->sprite,
 		 ATTR0_SQUARE,		
 		 ATTR1_SIZE_16,      
-		 ATTR2_PALBANK(0) | ATTR2_PRIO(2) | (mado->movement < 4 ? 16 : 20));	      
+		 ATTR2_PALBANK(0) | ATTR2_PRIO(1) | (mado->movement < 4 ? 16 : 20));	      
   }
   else if (mado->facing == Right) {
     obj_set_attr(mado->sprite,
 		 ATTR0_SQUARE,		
 		 ATTR1_SIZE_16,      
-		 ATTR2_PALBANK(0) | ATTR2_PRIO(2) | 36);	      
+		 ATTR2_PALBANK(0) | ATTR2_PRIO(1) | 36);	      
   }
   else if (mado->facing == Left) {
     obj_set_attr(mado->sprite,
 		 ATTR0_SQUARE,		
 		 ATTR1_SIZE_16,      
-		 ATTR2_PALBANK(0) | ATTR2_PRIO(2) | 32);	      
+		 ATTR2_PALBANK(0) | ATTR2_PRIO(1) | 32);	      
   };
   return 0;
 };
@@ -198,32 +198,30 @@ int mado_try_move(Mado* mado) {
   // Mado's position is set to the top left of the sprite
   switch (mado->facing) {
   case Up:
-    if (!tile_is_solid(mado->game_map, extract_tile_idx(bg0_map[(mado->pos_x/8) + 32*((mado->pos_y/8))]))
+    if (!tile_is_solid(mado->game_map, mado->pos_x/8 + 32*(mado->pos_y/8))
 	&&
-	!tile_is_solid(mado->game_map, extract_tile_idx(bg0_map[((mado->pos_x/8)+1) + 32*((mado->pos_y/8))]))) {
+	!tile_is_solid(mado->game_map, (mado->pos_x/8)+ 1 + 32*(mado->pos_y/8))) {
       mado->movement = 8;
     }
     break;
   case Down:
-    if(!tile_is_solid(mado->game_map, extract_tile_idx(bg0_map[(mado->pos_x/8) + 32*((mado->pos_y/8) + 3)]))
+    if(!tile_is_solid(mado->game_map, mado->pos_x/8 + 32*((mado->pos_y/8) + 3))
        &&
-       !tile_is_solid(mado->game_map, extract_tile_idx(bg0_map[((mado->pos_x/8) + 1) + 32*((mado->pos_y/8) + 3)]))
-       ) {
+       !tile_is_solid(mado->game_map, (mado->pos_x/8) + 1 + 32*((mado->pos_y/8) + 3))) {
       mado->movement = 8;
     }
-    break; 
+    break;
   case Left:
-    if(!tile_is_solid(mado->game_map, extract_tile_idx(bg0_map[((mado->pos_x/8) - 1) + 32*((mado->pos_y/8) + 2)]))
+    if(!tile_is_solid(mado->game_map, (mado->pos_x/8) - 1 + 32*((mado->pos_y/8) + 2))
        &&
-       !tile_is_solid(mado->game_map, extract_tile_idx(bg0_map[((mado->pos_x/8) - 1) + 32*((mado->pos_y/8) + 2)]))
-       ) {
+       !tile_is_solid(mado->game_map, (mado->pos_x/8) - 1 + 32*((mado->pos_y/8) + 2))) {
       mado->movement = 8;
     }
     break;
   case Right:
-    if(!tile_is_solid(mado->game_map, extract_tile_idx(bg0_map[((mado->pos_x/8) + 2) + 32*((mado->pos_y/8) + 2)]))
+    if(!tile_is_solid(mado->game_map, (mado->pos_x/8) + 2 + 32*((mado->pos_y/8) + 2))
        &&
-       !tile_is_solid(mado->game_map, extract_tile_idx(bg0_map[((mado->pos_x/8) + 2) + 32*((mado->pos_y/8) + 2)]))) {
+       !tile_is_solid(mado->game_map, (mado->pos_x/8) + 2 + 32*((mado->pos_y/8) + 2))) {
       mado->movement = 8;
     }
     break;

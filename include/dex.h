@@ -10,9 +10,6 @@
 OBJ_ATTR obj_buffer[128];
 OBJ_AFFINE *obj_aff_buffer= (OBJ_AFFINE*)obj_buffer;
 
-SCR_ENTRY *bg0_map= se_mem[SBB_0];
-SCR_ENTRY *bg1_map= se_mem[SBB_1];
-
 enum __INTERACTION {Heart};
 typedef enum __INTERACTION Interaction;
 

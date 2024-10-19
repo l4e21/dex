@@ -4,7 +4,7 @@
 
 ## TODO
 
-- Turn bedroom items into decoration layer
+- Fix mado solid and teleport checks for 64 by 64
 
 - Large worlds (this requires tile streaming / chunking)
 
