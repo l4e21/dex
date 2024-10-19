@@ -1,9 +1,5 @@
 #include "game_map.h"
 
-int mado_bedroom_solid_tiles[50] = {1,2,3,4,9,10,11,12,13,14,15,16,69,70,71,72,73,81,82,83,84,93,94,95,96,109,110,111,112};
-
-int mado_attic_solid_tiles[50] = {1,2,3,4};
-
 int extract_tile_idx(SCR_ENTRY tile) {
   return tile & SE_ID_MASK;
 }
@@ -182,12 +178,13 @@ int draw_mado_bedroom() {
   return 0;
 };
 
-int draw_mado_attic() {
-  for (int j=0; j<32;j++) {
-    for (int i=0; i<32;i++) {
-      for (int q=0; q<4; q++) {
-      draw_16_by_16(i*2 + 32*j*2 + 32*32*q, 0, 5);
-      };
+int draw_mado_attic() {  
+  for (int j=0; j<16;j++) {
+    for (int i=0; i<16;i++) {
+      draw_16_by_16(i*2 + 32*j*2, 0, mado_attic_tile_map[j][i]);
+      draw_16_by_16(i*2 + 32*j*2 + 32*32, 0, mado_attic_tile_map[j+16][i]);
+      draw_16_by_16(i*2 + 32*j*2 + 32*32*2, 0, mado_attic_tile_map[j][i+16]);
+      draw_16_by_16(i*2 + 32*j*2 + 32*32*3, 0, mado_attic_tile_map[j+16][i+16]);
     };
   };
   return 0;

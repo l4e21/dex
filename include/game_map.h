@@ -4,12 +4,16 @@
 #include <stdlib.h>
 #include <tonc.h>
 
+// From GRIT
 #include "mado.h"
 #include "mado_bedroom.h"
 #include "mado_attic.h"
 #include "bed.h"
 #include "rain.h"
 #include "emotes.h"
+
+// From include
+#include "tile_data.h"
 
 #define CBB_0  0
 #define SBB_0 28
