@@ -84,96 +84,101 @@ int tile_is_teleport(GameMap game_map, Warp* warp, int tile_idx) {
 // For some reason, it does it in quadrants for 64 by 64 backgrounds
 
 int draw_mado_bedroom() {
-  int row = 1;
-  int col = 1;
-  int tile_idx = 0;
-  
-  for (int i=0; i<=20*32; i++) {
-    if (i % 32 == 0) {
-      // Newline logic
-      row ^= 1;
-    };
-
-    // Alternate tiles because 16 by 16
-    col ^= 1;
-
-    if ((i % 32 > 3) && (i % 32 < 26)) {
-
-      if (i < 64) {
-	tile_idx = 0;
-      }
-
-      // Wall
-      else if (i < 128) {
-	tile_idx = 9;
-      }
-
-      // Wall
-      else if (i < 192) {
-	tile_idx = 13;
-      }
-      
-      // Floor
-      else if (i < 544) {
-	tile_idx = 17;
-      }
-
-      else {
-	tile_idx = 0;
-      }
-      
-    }
-
-    else {
-      tile_idx = 0;
-    };
-
-    bg0_map[i] = SE_PALBANK(0) | (tile_idx + col + row*2);
-
-    if (i < 544 && i > 64 && (i % 32 > 2) && (i % 32 < 27)) {
-    bg1_map[i] = SE_PALBANK(2) | (69 + col + row*2);
+  for (int j=0;j<16;j++) {
+    for (int i=0;i<16;i++) {
+      draw_16_by_16(i*2 + j*32*2, 0, mado_bedroom_tile_map[j][i]);
     };
   };
+  /* int row = 1; */
+  /* int col = 1; */
+  /* int tile_idx = 0; */
+  
+  /* for (int i=0; i<=20*32; i++) { */
+  /*   if (i % 32 == 0) { */
+  /*     // Newline logic */
+  /*     row ^= 1; */
+  /*   }; */
+
+  /*   // Alternate tiles because 16 by 16 */
+  /*   col ^= 1; */
+
+  /*   if ((i % 32 > 3) && (i % 32 < 26)) { */
+
+  /*     if (i < 64) { */
+  /* 	tile_idx = 0; */
+  /*     } */
+
+  /*     // Wall */
+  /*     else if (i < 128) { */
+  /* 	tile_idx = 9; */
+  /*     } */
+
+  /*     // Wall */
+  /*     else if (i < 192) { */
+  /* 	tile_idx = 13; */
+  /*     } */
+      
+  /*     // Floor */
+  /*     else if (i < 544) { */
+  /* 	tile_idx = 17; */
+  /*     } */
+
+  /*     else { */
+  /* 	tile_idx = 0; */
+  /*     } */
+      
+  /*   } */
+
+  /*   else { */
+  /*     tile_idx = 0; */
+  /*   }; */
+
+  /*   bg0_map[i] = SE_PALBANK(0) | (tile_idx + col + row*2); */
+
+  /*   if (i < 544 && i > 64 && (i % 32 > 2) && (i % 32 < 27)) { */
+  /*   bg1_map[i] = SE_PALBANK(2) | (69 + col + row*2); */
+  /*   }; */
+  /* }; */
 
   // Details
 
   // Bed L
-  draw_16_by_16(198, 1, 65);
-  draw_16_by_16(200, 1, 69);
-  draw_16_by_16(202, 1, 73);
+  /* draw_16_by_16(198, 1, 65); */
+  /* draw_16_by_16(200, 1, 69); */
+  /* draw_16_by_16(202, 1, 73); */
   
-  draw_16_by_16(262, 1, 77);
-  draw_16_by_16(264, 1, 81);
-  draw_16_by_16(266, 1, 85);
+  /* draw_16_by_16(262, 1, 77); */
+  /* draw_16_by_16(264, 1, 81); */
+  /* draw_16_by_16(266, 1, 85); */
 
-  draw_16_by_16(328, 1, 101);
+  /* draw_16_by_16(328, 1, 101); */
   
-  // Bed R
-  draw_16_by_16(210, 1, 89);
-  draw_16_by_16(212, 1, 93);
-  draw_16_by_16(214, 1, 97);
+  /* // Bed R */
+  /* draw_16_by_16(210, 1, 89); */
+  /* draw_16_by_16(212, 1, 93); */
+  /* draw_16_by_16(214, 1, 97); */
   
-  draw_16_by_16(274, 1, 105);
-  draw_16_by_16(276, 1, 109);
-  draw_16_by_16(278, 1, 85);
+  /* draw_16_by_16(274, 1, 105); */
+  /* draw_16_by_16(276, 1, 109); */
+  /* draw_16_by_16(278, 1, 85); */
 
-  draw_16_by_16(340, 1, 101);
+  /* draw_16_by_16(340, 1, 101); */
   
 
-  // Stairs
-  draw_16_by_16(342, 0, 41);
-  draw_16_by_16(344, 0, 45);
-  draw_16_by_16(408, 0, 49);
-  draw_16_by_16(406, 0, 53);
-  draw_16_by_16(280, 0, 57);
+  /* // Stairs */
+  /* draw_16_by_16(342, 0, 41); */
+  /* draw_16_by_16(344, 0, 45); */
+  /* draw_16_by_16(408, 0, 49); */
+  /* draw_16_by_16(406, 0, 53); */
+  /* draw_16_by_16(280, 0, 57); */
 
-  // Cracks etc
-  draw_16_by_16(432, 0, 25);
-  /* draw_16_by_16(408, 0, 29); */
-  draw_16_by_16(470, 0, 33);
-  draw_16_by_16(240, 0, 37);
-  draw_16_by_16(110, 0, 5);
-  draw_16_by_16(400, 0, 29);
+  /* // Cracks etc */
+  /* draw_16_by_16(432, 0, 25); */
+  /* /\* draw_16_by_16(408, 0, 29); *\/ */
+  /* draw_16_by_16(470, 0, 33); */
+  /* draw_16_by_16(240, 0, 37); */
+  /* draw_16_by_16(110, 0, 5); */
+  /* draw_16_by_16(400, 0, 29); */
   
   return 0;
 };
