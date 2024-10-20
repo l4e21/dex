@@ -107,7 +107,7 @@ int init_mado(Mado* mado, int x, int y, GameMap game_map) {
   dma3_cpy(pal_obj_mem, madoPal, madoPalLen / sizeof(u16));
 
   // Emotes Sprite
-  memcpy32(&tile_mem[4][160], emotesTiles, emotesTilesLen / sizeof(u32));
+  memcpy32(&tile_mem[4][200], emotesTiles, emotesTilesLen / sizeof(u32));
   dma3_cpy(&pal_obj_mem[16], emotesPal, emotesPalLen/ sizeof(u16));
 
   OBJ_ATTR *sprite = &obj_buffer[0];
@@ -122,7 +122,7 @@ int init_mado(Mado* mado, int x, int y, GameMap game_map) {
   obj_set_attr(emote,
 	       ATTR0_SQUARE,				// Square, regular sprite
 	       ATTR1_SIZE_16, 				// 64x64p,
-	       ATTR2_PALBANK(1) | ATTR2_PRIO(2) | 160);		// palbank 0, tile 0
+	       ATTR2_PALBANK(1) | ATTR2_PRIO(2) | 200);		// palbank 0, tile 0
   
   /* obj_set_pos(emote, x, y-64); */
   
@@ -133,63 +133,76 @@ int init_mado(Mado* mado, int x, int y, GameMap game_map) {
   mado->sprite = sprite;
   mado->emote = emote;
   mado->game_map = game_map;
+  mado->bob_factor = 0;
 
   return 0;
 };
 
 int turn_mado(Mado* mado) {
-  if (mado->facing == Up) {
+  switch (mado->facing) {
+  case Up:
     obj_set_attr(mado->sprite,
 		 ATTR0_SQUARE,		
 		 ATTR1_SIZE_32,      
 		 ATTR2_PALBANK(0) | ATTR2_PRIO(2) | 16);	      
-  }
-  else if (mado->facing == Down) {
+    break;
+  case Down:
     obj_set_attr(mado->sprite,
 		 ATTR0_SQUARE,		
 		 ATTR1_SIZE_32,      
 		 ATTR2_PALBANK(0) | ATTR2_PRIO(2) | 0);	      
-  }
-  else if (mado->facing == Right) {
+    break;
+  case Right:
     obj_set_attr(mado->sprite,
 		 ATTR0_SQUARE,		
 		 ATTR1_SIZE_32,      
 		 ATTR2_PALBANK(0) | ATTR2_PRIO(2) | 48);	      
-  }
-  else if (mado->facing == Left) {
+    break;
+  case Left:
     obj_set_attr(mado->sprite,
 		 ATTR0_SQUARE,		
 		 ATTR1_SIZE_32,      
 		 ATTR2_PALBANK(0) | ATTR2_PRIO(2) | 32);	      
+    break;
+  case InvalidDirection:
+    break;
   };
   return 0;
 };
 
 
 int turn_moving_mado(Mado* mado) {
-  if (mado->facing == Up) {
-    obj_set_attr(mado->sprite,
-		 ATTR0_SQUARE,		
-		 ATTR1_SIZE_32,      
-		 ATTR2_PALBANK(0)  | ATTR2_PRIO(2) | (mado->movement < 4 ? 96 : 112));	      
+  if (mado->movement < 5) {
+    turn_mado(mado);
   }
-  else if (mado->facing == Down) {
-    obj_set_attr(mado->sprite,
-		 ATTR0_SQUARE,		
-		 ATTR1_SIZE_32,      
-		 ATTR2_PALBANK(0) | ATTR2_PRIO(2) | (mado->movement < 4 ? 64 : 80));	      
-  }
-  else if (mado->facing == Right) {
-    obj_set_attr(mado->sprite,
-		 ATTR0_SQUARE,		
-		 ATTR1_SIZE_32,      
-		 ATTR2_PALBANK(0) | ATTR2_PRIO(2) | 144);	      
-  }
-  else if (mado->facing == Left) {
-    obj_set_attr(mado->sprite,
-		 ATTR0_SQUARE,		
-		 ATTR1_SIZE_32,      
-		 ATTR2_PALBANK(0) | ATTR2_PRIO(2) | 128);	      
+
+  else {
+    switch (mado->facing) {
+    case Up:
+      obj_set_attr(mado->sprite,
+		   ATTR0_SQUARE,		
+		   ATTR1_SIZE_32,      
+		   ATTR2_PALBANK(0)  | ATTR2_PRIO(2) | ((mado->pos_y/8 % 2 == 0) ? 96 : 112));	         break;      
+    case Down:
+      obj_set_attr(mado->sprite,
+		   ATTR0_SQUARE,		
+		   ATTR1_SIZE_32,      
+		   ATTR2_PALBANK(0) | ATTR2_PRIO(2) | ((mado->pos_y/8 % 2 == 0) ? 64 : 80));	         break;      
+    case Right:
+      obj_set_attr(mado->sprite,
+		   ATTR0_SQUARE,		
+		   ATTR1_SIZE_32,      
+		   ATTR2_PALBANK(0) | ATTR2_PRIO(2) | ((mado->pos_x/8 % 2 == 0) ? 160 : 176));	      
+      break;      
+    case Left:
+      obj_set_attr(mado->sprite,
+		   ATTR0_SQUARE,		
+		   ATTR1_SIZE_32,      
+		   ATTR2_PALBANK(0) | ATTR2_PRIO(2) | ((mado->pos_x/8 % 2 == 0) ? 128 : 144));	         break;
+
+    case InvalidDirection:
+      break;
+    };
   };
   return 0;
 };
@@ -198,30 +211,30 @@ int mado_try_move(Mado* mado) {
   // Mado's position is set to the top left of the sprite
   switch (mado->facing) {
   case Up:
-    if (!tile_is_solid(mado->game_map, mado->pos_x/8, mado->pos_y/8)
+    if (!tile_is_solid(mado->game_map, mado->pos_x/8, mado->pos_y/8+1)
 	&&
-	!tile_is_solid(mado->game_map, (mado->pos_x/8)+ 1, mado->pos_y/8)) {
+	!tile_is_solid(mado->game_map, (mado->pos_x/8)+ 1, mado->pos_y/8+1)) {
       mado->movement = 8;
     }
     break;
   case Down:
-    if(!tile_is_solid(mado->game_map, mado->pos_x/8, (mado->pos_y/8) + 3)
+    if(!tile_is_solid(mado->game_map, mado->pos_x/8, (mado->pos_y/8) + 4)
        &&
-       !tile_is_solid(mado->game_map, (mado->pos_x/8) + 1, (mado->pos_y/8) + 3)) {
+       !tile_is_solid(mado->game_map, (mado->pos_x/8) + 1, (mado->pos_y/8) + 4)) {
       mado->movement = 8;
     }
     break;
   case Left:
     if(!tile_is_solid(mado->game_map, (mado->pos_x/8) - 1, (mado->pos_y/8) + 2)
        &&
-       !tile_is_solid(mado->game_map, (mado->pos_x/8) - 1, (mado->pos_y/8) + 2)) {
+       !tile_is_solid(mado->game_map, (mado->pos_x/8) - 1, (mado->pos_y/8) + 3)) {
       mado->movement = 8;
     }
     break;
   case Right:
     if(!tile_is_solid(mado->game_map, (mado->pos_x/8) + 2, (mado->pos_y/8) + 2)
        &&
-       !tile_is_solid(mado->game_map, (mado->pos_x/8) + 2, (mado->pos_y/8) + 2)) {
+       !tile_is_solid(mado->game_map, (mado->pos_x/8) + 2, (mado->pos_y/8) + 3)) {
       mado->movement = 8;
     }
     break;
@@ -259,39 +272,79 @@ int move_mado(Mado* mado) {
   // Wraparound Logic
   switch (mado->facing) {
   case Up:
-    if (mado->pos_y == 0) {
-      mado->pos_y = 512;
+    // Wraparound
+    if (mado->pos_y <= 0) {
+      mado->pos_y += 512;
     }
-    else {
-    mado->pos_y -= 1;
+    else {      
+      mado->pos_y -= 1;
     };
+    
+    // Slight bob
+    if (mado->movement == 8) {
+      mado->bob_factor = -2;
+    }
+    else if (mado->movement == 1) {
+      mado->bob_factor = 0;
+    };
+
     mado->movement -= 1;
     break;
   case Down:
-    if (mado->pos_y == 512) {
-      mado->pos_y = 0;
+    // Wraparound
+    if (mado->pos_y >= 512) {
+      mado->pos_y -= 512;
     }
     else {
     mado->pos_y += 1;
     };
+    
+    // Slight bob
+    if (mado->movement == 8) {
+      mado->bob_factor = -2;
+    }
+    else if (mado->movement == 1) {
+      mado->bob_factor = 0;
+    };
+
     mado->movement -= 1;
     break;
   case Left:
-    if (mado->pos_x == 0) {
-      mado->pos_x = 512;
+    // Wraparound
+    if (mado->pos_x <= 0) {
+      mado->pos_x += 512;
     }
     else {
     mado->pos_x -= 1;
     };
+    
+    // Slight bob
+    if (mado->movement == 8) {
+      mado->bob_factor = -1;
+    }
+    else if (mado->movement == 1) {
+      mado->bob_factor = 0;
+    };
+
     mado->movement -= 1;
     break;
   case Right:
-    if (mado->pos_x == 512) {
-      mado->pos_x = 0;
+    // Wraparound
+    if (mado->pos_x >= 512) {
+      mado->pos_x -= 512;
     }
     else {
     mado->pos_x += 1;
     };
+
+    // Slight bob
+    if (mado->movement == 8) {
+      mado->bob_factor = -1;
+    }
+    else if (mado->movement == 1) {
+      mado->bob_factor = 0;
+    };
+    
     mado->movement -= 1;
     break;
 
@@ -321,14 +374,14 @@ int interact(Mado* mado) {
       obj_set_attr(mado->emote,
 		   ATTR0_SQUARE,				// Square, regular sprite
 		   ATTR1_SIZE_16, 				// 64x64p,
-		   ATTR2_PALBANK(1) | ATTR2_PRIO(2) | 160);		// palbank 0, tile 0
+		   ATTR2_PALBANK(1) | ATTR2_PRIO(2) | 200);		// palbank 0, tile 0
       obj_hide(mado->emote);
     }
     else {
       obj_set_attr(mado->emote,
 		   ATTR0_SQUARE,				// Square, regular sprite
 		   ATTR1_SIZE_16, 				// 64x64p,
-		   ATTR2_PALBANK(1) | ATTR2_PRIO(2) | (160 + (mado->interacting > 16 ? 0 : (mado->interacting > 8 ? 4 : 8))));		// palbank 0, tile 0
+		   ATTR2_PALBANK(1) | ATTR2_PRIO(2) | (200 + (mado->interacting > 16 ? 0 : (mado->interacting > 8 ? 4 : 8))));		// palbank 0, tile 0
       };
     break;
   }
@@ -442,10 +495,10 @@ int update_camera(Camera* camera, Mado* mado) {
   case Static:
     break;
   case Following:
-    camera->pos_x = mado->pos_x - (SCREEN_WIDTH/2);
-    camera->pos_y = mado->pos_y - (SCREEN_HEIGHT/2); 
- };
-
+    camera->pos_x = mado->pos_x - (SCREEN_WIDTH/2) + 8; // 8 for offset
+    camera->pos_y = mado->pos_y - (SCREEN_HEIGHT/2);
+    break;
+  };
   return 0;
 }
 
@@ -465,17 +518,17 @@ int game_loop(Mado* mado, Warp* warp, Camera* camera) {
     REG_BG0VOFS= camera->pos_y;
     REG_BG1HOFS= camera->pos_x;
     REG_BG1VOFS= camera->pos_y;
-    /* REG_BG2HOFS= camera->pos_x; */
-    /* REG_BG2VOFS= camera->pos_y; */
+    REG_BG2HOFS= camera->pos_x;
+    REG_BG2VOFS= camera->pos_y;
     
     switch (camera->behaviour) {
     case Static:
-      obj_set_pos(mado->sprite, mado->pos_x, mado->pos_y);
+      obj_set_pos(mado->sprite, mado->pos_x, mado->pos_y + mado->bob_factor);
       obj_set_pos(mado->emote, mado->pos_x, mado->pos_y-16);
       break;
     case Following:
-      obj_set_pos(mado->sprite, SCREEN_WIDTH/2, SCREEN_HEIGHT/2);
-      obj_set_pos(mado->emote, SCREEN_WIDTH/2, (SCREEN_HEIGHT/2)-16);
+      obj_set_pos(mado->sprite, SCREEN_WIDTH/2-8, SCREEN_HEIGHT/2 + mado->bob_factor);
+      obj_set_pos(mado->emote, SCREEN_WIDTH/2-8, (SCREEN_HEIGHT/2)-16);
       break;
     };
 

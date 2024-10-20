@@ -26,6 +26,7 @@ struct __MADO {
   OBJ_ATTR *sprite;
   OBJ_ATTR *emote;
   GameMap game_map;
+  int bob_factor;
 };
 
 typedef struct __MADO Mado;
