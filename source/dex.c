@@ -114,7 +114,7 @@ int init_mado(Mado* mado, int x, int y, GameMap game_map) {
   OBJ_ATTR *emote = &obj_buffer[1];
   obj_set_attr(sprite,
 	       ATTR0_SQUARE,				// Square, regular sprite
-	       ATTR1_SIZE_32, 				// 64x64p,
+	       ATTR1_SIZE_16x32, 				// 64x64p,
 	       ATTR2_PALBANK(0) | ATTR2_PRIO(2) | 0);		// palbank 0, tile 0
   
   /* obj_set_pos(sprite, x, y); */
@@ -143,25 +143,25 @@ int turn_mado(Mado* mado) {
   case Up:
     obj_set_attr(mado->sprite,
 		 ATTR0_SQUARE,		
-		 ATTR1_SIZE_32,      
+		 ATTR1_SIZE_16x32,      
 		 ATTR2_PALBANK(0) | ATTR2_PRIO(2) | 16);	      
     break;
   case Down:
     obj_set_attr(mado->sprite,
 		 ATTR0_SQUARE,		
-		 ATTR1_SIZE_32,      
+		 ATTR1_SIZE_16x32,      
 		 ATTR2_PALBANK(0) | ATTR2_PRIO(2) | 0);	      
     break;
   case Right:
     obj_set_attr(mado->sprite,
 		 ATTR0_SQUARE,		
-		 ATTR1_SIZE_32,      
+		 ATTR1_SIZE_16x32,      
 		 ATTR2_PALBANK(0) | ATTR2_PRIO(2) | 48);	      
     break;
   case Left:
     obj_set_attr(mado->sprite,
 		 ATTR0_SQUARE,		
-		 ATTR1_SIZE_32,      
+		 ATTR1_SIZE_16x32,      
 		 ATTR2_PALBANK(0) | ATTR2_PRIO(2) | 32);	      
     break;
   case InvalidDirection:
@@ -181,23 +181,23 @@ int turn_moving_mado(Mado* mado) {
     case Up:
       obj_set_attr(mado->sprite,
 		   ATTR0_SQUARE,		
-		   ATTR1_SIZE_32,      
+		   ATTR1_SIZE_16x32,      
 		   ATTR2_PALBANK(0)  | ATTR2_PRIO(2) | ((mado->pos_y/8 % 2 == 0) ? 96 : 112));	         break;      
     case Down:
       obj_set_attr(mado->sprite,
 		   ATTR0_SQUARE,		
-		   ATTR1_SIZE_32,      
+		   ATTR1_SIZE_16x32,      
 		   ATTR2_PALBANK(0) | ATTR2_PRIO(2) | ((mado->pos_y/8 % 2 == 0) ? 64 : 80));	         break;      
     case Right:
       obj_set_attr(mado->sprite,
 		   ATTR0_SQUARE,		
-		   ATTR1_SIZE_32,      
+		   ATTR1_SIZE_16x32,      
 		   ATTR2_PALBANK(0) | ATTR2_PRIO(2) | ((mado->pos_x/8 % 2 == 0) ? 160 : 176));	      
       break;      
     case Left:
       obj_set_attr(mado->sprite,
 		   ATTR0_SQUARE,		
-		   ATTR1_SIZE_32,      
+		   ATTR1_SIZE_16x32,      
 		   ATTR2_PALBANK(0) | ATTR2_PRIO(2) | ((mado->pos_x/8 % 2 == 0) ? 128 : 144));	         break;
 
     case InvalidDirection:
